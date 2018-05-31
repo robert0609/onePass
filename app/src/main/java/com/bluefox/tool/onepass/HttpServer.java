@@ -7,8 +7,12 @@ import com.bluefox.tool.onepass.model.Account;
 import com.bluefox.tool.onepass.model.Site;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,16 +36,19 @@ public class HttpServer extends NanoHTTPD {
             if (requestPath.startsWith("/webapi/")) {
                 return this.handleWebApi(session);
             }
+            else if (requestPath.startsWith("/static/")) {
+                inputStream = this.context.getAssets().open("content" + requestPath);
+                return newChunkedResponse(Response.Status.OK, null, inputStream);
+            }
             else {
                 switch (requestPath) {
-                    case "/":
-                        inputStream = this.context.getAssets().open("content/index.html");
-                        return newChunkedResponse(Response.Status.OK, "text/html", inputStream);
                     case "/favicon.ico":
                         return this.handleNotFound();
+                    case "/backup.db":
+                        return this.handleBackup();
                     default:
-                        inputStream = this.context.getAssets().open("content" + requestPath);
-                        return newChunkedResponse(Response.Status.OK, null, inputStream);
+                        inputStream = this.context.getAssets().open("content/index.html");
+                        return newChunkedResponse(Response.Status.OK, "text/html", inputStream);
                 }
             }
         } catch (IOException e) {
@@ -105,7 +112,7 @@ public class HttpServer extends NanoHTTPD {
 
     private Response handleSite(String operation, Map<String, List<String>> parameters) throws Exception {
         class SaveSiteResult {
-            long SiteId;
+            public long SiteId;
             public SaveSiteResult(long siteId) {
                 this.SiteId = siteId;
             }
@@ -118,7 +125,9 @@ public class HttpServer extends NanoHTTPD {
                 if (postBodies.isEmpty()) {
                     throw new Exception("Save site failed! Body is null");
                 }
-                long siteId = Store.getInstance(this.context).saveSite(gson.fromJson(postBodies.get(0), Site.class));
+                Site site = gson.fromJson(postBodies.get(0), Site.class);
+                site.Name = URLDecoder.decode(site.Name);
+                long siteId = Store.getInstance(this.context).saveSite(site);
                 return newFixedLengthResponse(Response.Status.OK, "application/json", gson.toJson(new WebApiResponse<SaveSiteResult>(new SaveSiteResult(siteId))));
             case "fetch":
             default:
@@ -133,7 +142,7 @@ public class HttpServer extends NanoHTTPD {
 
     private Response handleAccount(String operation, Map<String, List<String>> parameters) throws Exception {
         class SaveAccountResult {
-            long AccountId;
+            public long AccountId;
             public SaveAccountResult(long accountId) {
                 this.AccountId = accountId;
             }
@@ -176,14 +185,23 @@ public class HttpServer extends NanoHTTPD {
         return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/html", builder.toString());
     }
 
-    class WebApiResponse<T> {
-        public int ErrorCode;
-        public String ErrorMessage;
-        public T Data;
-
-        public boolean getIsSuccess() {
-            return this.ErrorCode == 0;
+    private Response handleBackup() {
+        try {
+            String pkgName = this.context.getPackageName();
+            File db = new File("/data/data/" + pkgName + "/databases/op.db");
+            FileInputStream inputStream = new FileInputStream(db);
+            return newChunkedResponse(Response.Status.OK, "application/octet-stream", inputStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return this.handleNotFound();
         }
+    }
+
+    class WebApiResponse<T> {
+        public int errorCode;
+        public String message;
+        public T data;
+        public boolean isSuccess;
 
         public WebApiResponse() {
             this(0, null, null);
@@ -193,14 +211,19 @@ public class HttpServer extends NanoHTTPD {
             this(0, null, data);
         }
 
-        public WebApiResponse(int errorCode, String errorMessage) {
-            this(errorCode, errorMessage, null);
+        public WebApiResponse(int errorCode, String message) {
+            this(errorCode, message, null);
         }
 
-        private WebApiResponse(int errorCode, String errorMessage, T data) {
-            this.ErrorCode = errorCode;
-            this.ErrorMessage = errorMessage;
-            this.Data = data;
+        private WebApiResponse(int errorCode, String message, T data) {
+            this.errorCode = errorCode;
+            this.message = message;
+            this.data = data;
+            this.setSuccess();
+        }
+
+        private void setSuccess() {
+            this.isSuccess = this.errorCode == 0;
         }
     }
 }
