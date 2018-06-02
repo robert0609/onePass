@@ -30,22 +30,30 @@ public class HttpServer extends NanoHTTPD {
     @Override
     public Response serve(IHTTPSession session) {
         try {
+            if (session.getMethod().equals(Method.POST)) {
+                Map<String, String> files = new HashMap<>();
+                session.parseBody(files);//TODO: test files' data
+            }
             String requestPath = session.getUri();
-            Log.println(Log.DEBUG, "request", "url: " + requestPath);
             InputStream inputStream = null;
             if (requestPath.startsWith("/webapi/")) {
-                return this.handleWebApi(session);
+                return this.checkAuth(session) ? this.handleWebApi(session) : this.needAuthReponse();
             }
             else if (requestPath.startsWith("/static/")) {
                 inputStream = this.context.getAssets().open("content" + requestPath);
                 return newChunkedResponse(Response.Status.OK, null, inputStream);
+            }
+            else if (requestPath.startsWith("/login")) {
+                return this.handleLogin(session);
             }
             else {
                 switch (requestPath) {
                     case "/favicon.ico":
                         return this.handleNotFound();
                     case "/backup.db":
-                        return this.handleBackup();
+                        return this.checkAuth(session) ? this.handleBackup() : this.needAuthReponse();
+                    case "/register":
+                        return this.handleRegister();
                     default:
                         inputStream = this.context.getAssets().open("content/index.html");
                         return newChunkedResponse(Response.Status.OK, "text/html", inputStream);
@@ -53,11 +61,55 @@ public class HttpServer extends NanoHTTPD {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return this.handleError();
+            return this.handleError(e);
         } catch (Exception e) {
             e.printStackTrace();
-            return this.handleError();
+            return this.handleError(e);
         }
+    }
+
+    private boolean checkAuth(IHTTPSession session) throws Exception {
+        String auth = null;
+        //先从parameter中取
+        Map<String, List<String>> parameters = session.getParameters();
+        List<String> authes = parameters.get("authority");
+        if (authes != null && authes.size() > 0) {
+            auth = authes.get(0);
+        }
+        //parameter中不存在，再从cookie中取
+        if (auth == null || auth == "") {
+            auth = session.getCookies().read("authority");
+        }
+
+        if (auth == null || auth == "") {
+            return false;
+        }
+        String md5AuthInDB = Store.getInstance(this.context).getUser();
+        if (md5AuthInDB == null) {
+            throw new Exception("There is no auth in db!");
+        }
+        String md5Auth = Md5.execute(auth);
+        return md5Auth.equals(md5AuthInDB);
+    }
+
+    private Response needAuthReponse() {
+        Gson gson = new Gson();
+        return newFixedLengthResponse(Response.Status.OK, "application/json", gson.toJson(new WebApiResponse(1, "need auth!")));
+    }
+
+    private Response handleLogin(IHTTPSession session) throws Exception {
+        if (this.checkAuth(session)) {
+            Gson gson = new Gson();
+            return newFixedLengthResponse(Response.Status.OK, "application/json", gson.toJson(new WebApiResponse()));
+        }
+        else {
+            return this.needAuthReponse();
+        }
+    }
+
+    private Response handleRegister() throws Exception {
+        long id = Store.getInstance(this.context).saveUser(Md5.execute("yanghuiping521"));
+        return newFixedLengthResponse(Response.Status.OK, "text/plain", String.valueOf(id));
     }
 
     private Response handleWebApi(IHTTPSession session) {
@@ -69,15 +121,11 @@ public class HttpServer extends NanoHTTPD {
             }
             String entity = segments[1];
             String operation = segments.length > 2 ? segments[2] : "get";
-            if (session.getMethod().equals(Method.POST)) {
-                Map<String, String> files = new HashMap<>();
-                session.parseBody(files);//TODO: test files' data
-            }
             switch (entity) {
                 case "site":
                     return this.handleSite(operation, session.getParameters());
                 case "account":
-                    return this.handleAccount(operation, session.getParameters());
+                    return this.handleAccount(operation, session.getCookies().read("authority"), session.getParameters());
                 case "search":
                     return this.handleSearch(session.getParameters());
                 default:
@@ -96,14 +144,14 @@ public class HttpServer extends NanoHTTPD {
         String keyword = null;
         boolean withAccount = false;
         List<String> keywords = parameters.get("keyword");
-        if (keywords.size() > 0) {
+        if (keywords != null && keywords.size() > 0) {
             keyword = keywords.get(0);
         }
         if (keyword == null || keyword == "") {
             throw new Exception("Search failed! Keyword is null!");
         }
         List<String> withaccounts = parameters.get("withaccount");
-        if (withaccounts.size() > 0) {
+        if (withaccounts != null && withaccounts.size() > 0) {
             withAccount = Boolean.parseBoolean(withaccounts.get(0));
         }
         List<Site> sites = Store.getInstance(this.context).search(keyword, withAccount);
@@ -122,7 +170,7 @@ public class HttpServer extends NanoHTTPD {
         switch (operation) {
             case "save":
                 List<String> postBodies = parameters.get("site");
-                if (postBodies.isEmpty()) {
+                if (postBodies == null || postBodies.isEmpty()) {
                     throw new Exception("Save site failed! Body is null");
                 }
                 Site site = gson.fromJson(postBodies.get(0), Site.class);
@@ -132,15 +180,18 @@ public class HttpServer extends NanoHTTPD {
             case "fetch":
             default:
                 List<String> ids = parameters.get("id");
-                if (ids.isEmpty()) {
-                    throw new Exception("Fetch site failed! Id is null");
+                List<String> levels = parameters.get("level");
+                if ((ids == null || ids.isEmpty()) && (levels == null || levels.isEmpty())) {
+                    throw new Exception("Fetch site failed! Id and Level is null");
                 }
-                List<Site> sites = Store.getInstance(this.context).getSite(Long.parseLong(ids.get(0)));
+                long id = ids != null && ids.size() > 0 ? Long.parseLong(ids.get(0)) : 0;
+                int level = levels != null && levels.size() > 0 ? Integer.parseInt(levels.get(0)) : 0;
+                List<Site> sites = Store.getInstance(this.context).getSite(id, level);
                 return newFixedLengthResponse(Response.Status.OK, "application/json", gson.toJson(new WebApiResponse<List<Site>>(sites)));
         }
     }
 
-    private Response handleAccount(String operation, Map<String, List<String>> parameters) throws Exception {
+    private Response handleAccount(String operation, String auth, Map<String, List<String>> parameters) throws Exception {
         class SaveAccountResult {
             public long AccountId;
             public SaveAccountResult(long accountId) {
@@ -152,27 +203,39 @@ public class HttpServer extends NanoHTTPD {
         switch (operation) {
             case "save":
                 List<String> postBodies = parameters.get("account");
-                if (postBodies.isEmpty()) {
+                if (postBodies == null || postBodies.isEmpty()) {
                     throw new Exception("Save account failed! Body is null");
                 }
-                long accountId = Store.getInstance(this.context).saveAccount(gson.fromJson(postBodies.get(0), Account.class));
+                Account newAccount = gson.fromJson(postBodies.get(0), Account.class);
+                newAccount.Password = Aes.encrypt(auth, newAccount.Password);
+                long accountId = Store.getInstance(this.context).saveAccount(newAccount);
                 return newFixedLengthResponse(Response.Status.OK, "application/json", gson.toJson(new WebApiResponse<SaveAccountResult>(new SaveAccountResult(accountId))));
             case "fetch":
             default:
                 List<String> ids = parameters.get("id");
                 List<String> siteIds = parameters.get("siteid");
-                if (ids.isEmpty() && siteIds.isEmpty()) {
+                if ((ids == null || ids.isEmpty()) && (siteIds == null || siteIds.isEmpty())) {
                     throw new Exception("Fetch account failed! Id and SiteId is null");
                 }
-                List<Account> accounts = Store.getInstance(this.context).getAccount(ids.size() > 0 ? Long.parseLong(ids.get(0)) : 0, siteIds.size() > 0 ? Long.parseLong(siteIds.get(0)) : 0);
+                long id = ids != null && ids.size() > 0 ? Long.parseLong(ids.get(0)) : 0;
+                long siteId = siteIds != null && siteIds.size() > 0 ? Long.parseLong(siteIds.get(0)) : 0;
+                List<Account> accounts = Store.getInstance(this.context).getAccount(id, siteId);
+                for (int i = 0; i < accounts.size(); ++i) {
+                    Account acc = accounts.get(i);
+                    acc.Password = Aes.decrypt(auth, acc.Password);
+                }
                 return newFixedLengthResponse(Response.Status.OK, "application/json", gson.toJson(new WebApiResponse<List<Account>>(accounts)));
         }
     }
 
-    private Response handleError() {
+    private Response handleError(Exception e) {
         StringBuilder builder = new StringBuilder();
         builder.append("<!DOCTYPE html><html><body>");
-        builder.append("Internal Error!");
+        builder.append(e.getMessage());
+        StackTraceElement[] traces = e.getStackTrace();
+        for (int i = 0; i < traces.length; ++i) {
+            builder.append(traces[i]);
+        }
         builder.append("</body></html>\n");
         return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "text/html", builder.toString());
     }

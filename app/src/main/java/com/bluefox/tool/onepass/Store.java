@@ -30,6 +30,7 @@ public class Store extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.execSQL("create table user(id integer primary key autoincrement, token varchar(100))");
         db.execSQL("create table site(id integer primary key autoincrement, name varchar(50), url varchar(100), level integer)");
         db.execSQL("create table certification(id integer primary key autoincrement, siteId integer, uid varchar(50), pwd varchar(50))");
     }
@@ -39,10 +40,49 @@ public class Store extends SQLiteOpenHelper {
 
     }
 
-    public List<Site> getSite(long id) throws Exception {
+    public String getUser() {
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.query("site", null, "id=?", new String[] {String.valueOf(id)}, null, null, null);
+            Cursor cursor = db.rawQuery("select * from user order by id desc limit 0,1", null);
+            String token = null;
+            while (cursor.moveToNext()) {
+                token = cursor.getString(cursor.getColumnIndex("token"));
+            }
+            return token;
+        }
+        catch (Exception ex) {
+            throw ex;
+        }
+        finally {
+            db.close();
+        }
+    }
+
+    public long saveUser(String token) throws Exception {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            ContentValues values = new ContentValues();
+            values.put("token", token);
+            return db.insert("user", null, values);
+        }
+        catch (Exception ex) {
+            throw ex;
+        }
+        finally {
+            db.close();
+        }
+    }
+
+    public List<Site> getSite(long id, int level) throws Exception {
+        SQLiteDatabase db = this.getReadableDatabase();
+        try {
+            Cursor cursor = null;
+            if (id > 0) {
+                cursor = db.query("site", null, "id=?", new String[] {String.valueOf(id)}, null, null, null);
+            }
+            else {
+                cursor = db.query("site", null, "level=?", new String[] {String.valueOf(level)}, null, null, null);
+            }
             List<Site> result = new ArrayList<>();
             while (cursor.moveToNext()) {
                 Site site = new Site();
@@ -156,7 +196,7 @@ public class Store extends SQLiteOpenHelper {
     public List<Site> search(String keyword, boolean withAccount) {
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.query("site", null, "name like '%?%' or url like '%?%'", new String[] { keyword }, null, null, null);
+            Cursor cursor = db.query("site", null, "name like ? or url like ?", new String[] { "%" + keyword + "%" }, null, null, null);
             List<Site> result = new ArrayList<>();
             Map<Long, Integer> siteIndexs = new HashMap<>();
             while (cursor.moveToNext()) {
@@ -180,10 +220,10 @@ public class Store extends SQLiteOpenHelper {
                 Cursor cursor1 = db.query("certification", null, "siteId in (?)", new String[]{sbSiteIds.toString()}, null, null, null);
                 while (cursor1.moveToNext()) {
                     Account account = new Account();
-                    account.Id = Long.parseLong(cursor.getString(cursor.getColumnIndex("id")));
-                    account.SiteId = Long.parseLong(cursor.getString(cursor.getColumnIndex("siteId")));
-                    account.UserName = cursor.getString(cursor.getColumnIndex("uid"));
-                    account.Password = cursor.getString(cursor.getColumnIndex("pwd"));
+                    account.Id = Long.parseLong(cursor1.getString(cursor1.getColumnIndex("id")));
+                    account.SiteId = Long.parseLong(cursor1.getString(cursor1.getColumnIndex("siteId")));
+                    account.UserName = cursor1.getString(cursor1.getColumnIndex("uid"));
+                    account.Password = cursor1.getString(cursor1.getColumnIndex("pwd"));
                     result.get(siteIndexs.get(account.SiteId)).AccountList.add(account);
                 }
             }
