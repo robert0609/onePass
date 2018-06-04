@@ -108,7 +108,7 @@ public class HttpServer extends NanoHTTPD {
     }
 
     private Response handleRegister() throws Exception {
-        long id = Store.getInstance(this.context).saveUser(Md5.execute("yanghuiping521"));
+        long id = Store.getInstance(this.context).saveUser(Md5.execute("yanghuiping521"));//TODO:
         return newFixedLengthResponse(Response.Status.OK, "text/plain", String.valueOf(id));
     }
 
