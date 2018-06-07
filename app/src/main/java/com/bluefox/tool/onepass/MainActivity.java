@@ -27,12 +27,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        HttpServer server = new HttpServer(this);
-        try {
-            server.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        HttpServer server = new HttpServer(this);
+//        try {
+//            server.start();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
