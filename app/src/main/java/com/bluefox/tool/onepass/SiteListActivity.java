@@ -16,7 +16,7 @@ public class SiteListActivity extends AppCompatActivity implements SiteListFragm
         setContentView(R.layout.activity_site_list);
 
         //init site list fragment
-        SiteListFragment siteListFragment = SiteListFragment.newInstance(0, 2, null);
+        SiteListFragment siteListFragment = SiteListFragment.newInstance(0, 1, null);
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.siteListLayout, siteListFragment);

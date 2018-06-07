@@ -1,11 +1,13 @@
 package com.bluefox.tool.onepass;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,6 +98,21 @@ public class SiteListFragment extends Fragment {
                 throw new Exception("parameter is invalid!");
             }
             this.adapter = new SiteListAdapter(this.context, siteList);
+            this.adapter.setOnSiteClickListener(new SiteListAdapter.OnSiteClickListener() {
+                @Override
+                public void onSiteClick(View view, Site site) {
+                    Intent intent = new Intent(context, AccountListActivity.class);
+                    intent.putExtra("siteId", site.Id);
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onUrlClick(View view, String url) {
+                    Uri uri = Uri.parse(url);
+                    Intent intent  = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                }
+            });
             RecyclerView items = (RecyclerView)view.findViewById(R.id.items);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this.context);
             items.setLayoutManager(layoutManager);
