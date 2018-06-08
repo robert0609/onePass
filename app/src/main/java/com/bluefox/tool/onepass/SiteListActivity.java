@@ -8,12 +8,12 @@ import android.os.Bundle;
 
 import java.io.IOException;
 
-public class SiteListActivity extends AppCompatActivity implements SiteListFragment.OnFragmentInteractionListener {
+public class SiteListActivity extends BaseActivity implements SiteListFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_site_list);
+        setContentLayout(R.layout.activity_site_list);
 
         //init site list fragment
         SiteListFragment siteListFragment = SiteListFragment.newInstance(0, 1, null);
