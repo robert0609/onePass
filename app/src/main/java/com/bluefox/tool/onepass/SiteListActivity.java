@@ -1,5 +1,6 @@
 package com.bluefox.tool.onepass;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -15,20 +16,30 @@ public class SiteListActivity extends BaseActivity implements SiteListFragment.O
         super.onCreate(savedInstanceState);
         setContentLayout(R.layout.activity_site_list);
 
+        Intent intent = this.getIntent();
+        int level = intent.getIntExtra("level", 0);
+
+        this.loadSiteList(level);
+
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        int level = intent.getIntExtra("level", 0);
+
+        this.loadSiteList(level);
+    }
+
+    private void loadSiteList(int level) {
+
         //init site list fragment
-        SiteListFragment siteListFragment = SiteListFragment.newInstance(0, 1, null);
+        SiteListFragment siteListFragment = SiteListFragment.newInstance(0, level, null);
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.siteListLayout, siteListFragment);
         fragmentTransaction.commit();
-
-        HttpServer server = new HttpServer(this);
-        try {
-            server.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     @Override

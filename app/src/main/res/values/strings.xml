@@ -5,4 +5,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="home">home</string>
+    <string name="level_1">level 1</string>
+    <string name="level_2">level 2</string>
+    <string name="level_3">level 3</string>
 </resources>

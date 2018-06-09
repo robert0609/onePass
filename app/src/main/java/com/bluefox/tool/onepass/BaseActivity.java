@@ -1,19 +1,33 @@
 package com.bluefox.tool.onepass;
 
 import android.content.Intent;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 
-public class BaseActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
 
+public class BaseActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+    private DrawerLayout drawerLayout;
+    private ListView drawerLeftMenu;
     private LinearLayout commonContent;
+
+    private List<String> menus;
+    private String titleHome;
+    private String titleLevel1;
+    private String titleLevel2;
+    private String titleLevel3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +37,23 @@ public class BaseActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar)findViewById(R.id.common_toolbar);
         setSupportActionBar(toolbar);
         this.commonContent = (LinearLayout)findViewById(R.id.common_content);
+        this.drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        this.drawerLeftMenu = (ListView)findViewById(R.id.drawer_left_menu);
+
+
+        this.titleHome = getResources().getText(R.string.home).toString();
+        this.titleLevel1 = getResources().getText(R.string.level_1).toString();
+        this.titleLevel2 = getResources().getText(R.string.level_2).toString();
+        this.titleLevel3 = getResources().getText(R.string.level_3).toString();
+
+        this.menus = new ArrayList<>();
+        this.menus.add(titleHome);
+        this.menus.add(titleLevel1);
+        this.menus.add(titleLevel2);
+        this.menus.add(titleLevel3);
+        DrawerLeftMenuAdapter drawerLeftMenuAdapter = new DrawerLeftMenuAdapter(this, this.menus);
+        this.drawerLeftMenu.setAdapter(drawerLeftMenuAdapter);
+        this.drawerLeftMenu.setOnItemClickListener(this);
     }
 
     public void setContentLayout(int layoutId) {
@@ -53,5 +84,30 @@ public class BaseActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String menuTitle = this.menus.get(position);
+        if (menuTitle == titleLevel1) {
+            Intent intent = new Intent(this, SiteListActivity.class);
+            intent.putExtra("level", 1);
+            startActivity(intent);
+        }
+        else if (menuTitle == titleLevel2) {
+            Intent intent = new Intent(this, SiteListActivity.class);
+            intent.putExtra("level", 2);
+            startActivity(intent);
+        }
+        else if (menuTitle == titleLevel3) {
+            Intent intent = new Intent(this, SiteListActivity.class);
+            intent.putExtra("level", 3);
+            startActivity(intent);
+        }
+        else {
+            Intent intent = new Intent(this, HomeActivity.class);
+            startActivity(intent);
+        }
+        this.drawerLayout.closeDrawer(this.drawerLeftMenu);
     }
 }
