@@ -1,5 +1,7 @@
 package com.bluefox.tool.onepass;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.bluefox.tool.onepass.model.Account;
 
@@ -35,6 +38,8 @@ public class AccountListFragment extends Fragment {
     private Context context;
     private AccountListAdapter adapter;
 
+    private ClipboardManager clipboardManager;
+
     public AccountListFragment() {
         // Required empty public constructor
     }
@@ -58,7 +63,8 @@ public class AccountListFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);//获取剪贴板管理器：
+        this.clipboardManager = (ClipboardManager)this.context.getSystemService(Context.CLIPBOARD_SERVICE);
         if (getArguments() != null) {
             id = getArguments().getLong(ARG_ID);
             siteId = getArguments().getLong(ARG_SITEID);
@@ -92,6 +98,21 @@ public class AccountListFragment extends Fragment {
             }
 
             this.adapter = new AccountListAdapter(this.context, accountList);
+            this.adapter.setOnAccountClickListener(new AccountListAdapter.OnAccountClickListener() {
+                @Override
+                public void onCopyUserNameClick(View view, String username) {
+                    ClipData data = ClipData.newPlainText("temp", username);
+                    clipboardManager.setPrimaryClip(data);
+                    Toast.makeText(context, "copied successfully!", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onCopyPasswordClick(View view, String password) {
+                    ClipData data = ClipData.newPlainText("temp", password);
+                    clipboardManager.setPrimaryClip(data);
+                    Toast.makeText(context, "copied successfully!", Toast.LENGTH_SHORT).show();
+                }
+            });
             RecyclerView items = (RecyclerView)view.findViewById(R.id.items);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this.context);
             items.setLayoutManager(layoutManager);

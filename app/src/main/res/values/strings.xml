@@ -2,6 +2,8 @@
     <string name="app_name">OnePass</string>
     <string name="app_bar_search_title">Search</string>
     <string name="button_unlock_title">unlock</string>
+    <string name="button_copy_username_title">copy username</string>
+    <string name="button_copy_password_title">copy password</string>
     <string name="title_activity_main">MainActivity</string>
 
     <!-- TODO: Remove or change this placeholder text -->
