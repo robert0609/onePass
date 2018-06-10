@@ -19,18 +19,9 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseActivity extends AuthActivity implements AdapterView.OnItemClickListener {
+public class BaseActivity extends AuthActivity {
     private Toolbar toolbar;
-
-    private DrawerLayout drawerLayout;
-    private ListView drawerLeftMenu;
     private LinearLayout commonContent;
-
-    private List<String> menus;
-    private String titleHome;
-    private String titleLevel1;
-    private String titleLevel2;
-    private String titleLevel3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,23 +32,6 @@ public class BaseActivity extends AuthActivity implements AdapterView.OnItemClic
         setSupportActionBar(this.toolbar);
         this.setBackArrow();
         this.commonContent = (LinearLayout)findViewById(R.id.common_content);
-        this.drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        this.drawerLeftMenu = (ListView)findViewById(R.id.drawer_left_menu);
-
-
-        this.titleHome = getResources().getText(R.string.home).toString();
-        this.titleLevel1 = getResources().getText(R.string.level_1).toString();
-        this.titleLevel2 = getResources().getText(R.string.level_2).toString();
-        this.titleLevel3 = getResources().getText(R.string.level_3).toString();
-
-        this.menus = new ArrayList<>();
-        this.menus.add(titleHome);
-        this.menus.add(titleLevel1);
-        this.menus.add(titleLevel2);
-        this.menus.add(titleLevel3);
-        DrawerLeftMenuAdapter drawerLeftMenuAdapter = new DrawerLeftMenuAdapter(this, this.menus);
-        this.drawerLeftMenu.setAdapter(drawerLeftMenuAdapter);
-        this.drawerLeftMenu.setOnItemClickListener(this);
     }
 
     /**
@@ -83,53 +57,5 @@ public class BaseActivity extends AuthActivity implements AdapterView.OnItemClic
         View contentView = layoutInflater.inflate(layoutId, null);
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         this.commonContent.addView(contentView, params);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_global, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.app_bar_search) {
-            Intent intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String menuTitle = this.menus.get(position);
-        if (menuTitle == titleLevel1) {
-            Intent intent = new Intent(this, SiteListActivity.class);
-            intent.putExtra("level", 1);
-            startActivity(intent);
-        }
-        else if (menuTitle == titleLevel2) {
-            Intent intent = new Intent(this, SiteListActivity.class);
-            intent.putExtra("level", 2);
-            startActivity(intent);
-        }
-        else if (menuTitle == titleLevel3) {
-            Intent intent = new Intent(this, SiteListActivity.class);
-            intent.putExtra("level", 3);
-            startActivity(intent);
-        }
-        else {
-            Intent intent = new Intent(this, HomeActivity.class);
-            startActivity(intent);
-        }
-        this.drawerLayout.closeDrawer(this.drawerLeftMenu);
     }
 }

@@ -9,7 +9,7 @@ import android.os.Bundle;
 
 import java.io.IOException;
 
-public class SiteListActivity extends BaseActivity implements SiteListFragment.OnFragmentInteractionListener {
+public class SiteListActivity extends DrawerActivity implements SiteListFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -17,7 +17,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
-public class HomeActivity extends BaseActivity {
+public class HomeActivity extends DrawerActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -4,16 +4,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
-public class AccountListActivity extends AuthActivity implements AccountListFragment.OnFragmentInteractionListener {
+public class AccountListActivity extends BaseActivity implements AccountListFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_account_list);
+        setContentLayout(R.layout.activity_account_list);
 
         Intent intent = this.getIntent();
         long siteId = intent.getLongExtra("siteId", 0);
