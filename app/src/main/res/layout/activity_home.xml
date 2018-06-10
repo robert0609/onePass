@@ -7,10 +7,14 @@
     android:orientation="vertical"
     tools:context=".HomeActivity">
 
-    <ImageButton
+    <ToggleButton
+        android:id="@+id/web_toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="switch"/>
+        android:layout_gravity="center_horizontal"
+        android:textOff=""
+        android:textOn=""
+        android:background="@drawable/web_toggle_selector" />
 
     <TextView
         android:id="@+id/management_url"
@@ -18,4 +22,5 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="20sp"/>
+
 </LinearLayout>

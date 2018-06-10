@@ -8,7 +8,10 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -17,12 +20,16 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
-public class HomeActivity extends DrawerActivity {
+public class HomeActivity extends DrawerActivity implements CompoundButton.OnCheckedChangeListener {
+    private ToggleButton webToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentLayout(R.layout.activity_home);
+
+        webToggle = (ToggleButton)findViewById(R.id.web_toggle);
+        webToggle.setOnCheckedChangeListener(this);
 
         TextView webUrl = (TextView)findViewById(R.id.management_url);
         webUrl.setText("http://" + this.getLocalIpAddress() + ":18888");
@@ -31,15 +38,6 @@ public class HomeActivity extends DrawerActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-    }
-
-    private void startHttpServer() {
-        HttpServer server = new HttpServer(this);
-        try {
-            server.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public String getLocalIpAddress() {
@@ -88,5 +86,22 @@ public class HomeActivity extends DrawerActivity {
                 ((ip >> 8) & 0xFF) + "." +
                 ((ip >> 16) & 0xFF) + "." +
                 (ip >> 24 & 0xFF);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        opApp app = (opApp)getApplicationContext();
+        if (isChecked) {
+            try {
+                app.startHttpServer();
+            } catch (IOException e) {
+                webToggle.setChecked(false);
+                e.printStackTrace();
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+        else {
+            app.stopHttpServer();
+        }
     }
 }

@@ -4,7 +4,10 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 
+import java.io.IOException;
+
 public class opApp extends Application {
+    private HttpServer httpServer;
     private String authority;
 
     public String getAuthority() {
@@ -21,5 +24,26 @@ public class opApp extends Application {
         }
         String md5Auth = Md5.execute(auth);
         return md5Auth.equals(md5AuthInDB);
+    }
+
+
+    public void startHttpServer() throws IOException {
+        if (httpServer == null) {
+            this.httpServer = new HttpServer(this);
+        }
+        if (this.httpServer.wasStarted()) {
+            return;
+        }
+        this.httpServer.start();
+    }
+
+    public void stopHttpServer() {
+        if (httpServer == null) {
+            return;
+        }
+        if (this.httpServer.wasStarted()) {
+            this.httpServer.stop();
+            this.httpServer = null;
+        }
     }
 }
