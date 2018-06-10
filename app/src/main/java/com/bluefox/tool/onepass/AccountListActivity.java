@@ -13,6 +13,8 @@ public class AccountListActivity extends BaseActivity implements AccountListFrag
         super.onCreate(savedInstanceState);
         setContentLayout(R.layout.activity_account_list);
 
+        setTitle("Account List");
+
         Intent intent = this.getIntent();
         long siteId = intent.getLongExtra("siteId", 0);
 

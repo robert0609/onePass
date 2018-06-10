@@ -27,12 +27,20 @@ public class HomeActivity extends DrawerActivity implements CompoundButton.OnChe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentLayout(R.layout.activity_home);
-
+        opApp app = (opApp)getApplicationContext();
         webToggle = (ToggleButton)findViewById(R.id.web_toggle);
+        webToggle.setChecked(app.getHttpIsStart());
         webToggle.setOnCheckedChangeListener(this);
 
         TextView webUrl = (TextView)findViewById(R.id.management_url);
         webUrl.setText("http://" + this.getLocalIpAddress() + ":18888");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        opApp app = (opApp)getApplicationContext();
+        webToggle.setChecked(app.getHttpIsStart());
     }
 
     @Override
@@ -92,12 +100,9 @@ public class HomeActivity extends DrawerActivity implements CompoundButton.OnChe
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         opApp app = (opApp)getApplicationContext();
         if (isChecked) {
-            try {
-                app.startHttpServer();
-            } catch (IOException e) {
+            if (!app.startHttpServer()) {
                 webToggle.setChecked(false);
-                e.printStackTrace();
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Http server start failed!", Toast.LENGTH_SHORT).show();
             }
         }
         else {

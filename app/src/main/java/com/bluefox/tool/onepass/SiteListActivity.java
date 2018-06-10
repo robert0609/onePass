@@ -19,6 +19,8 @@ public class SiteListActivity extends DrawerActivity implements SiteListFragment
         Intent intent = this.getIntent();
         int level = intent.getIntExtra("level", 0);
 
+        setTitle("Level " + level);
+
         this.loadSiteList(level);
 
     }
@@ -28,6 +30,8 @@ public class SiteListActivity extends DrawerActivity implements SiteListFragment
         super.onNewIntent(intent);
 
         int level = intent.getIntExtra("level", 0);
+
+        setTitle("Level " + level);
 
         this.loadSiteList(level);
     }

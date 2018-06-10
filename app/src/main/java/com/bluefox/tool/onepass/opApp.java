@@ -8,8 +8,12 @@ import java.io.IOException;
 
 public class opApp extends Application {
     private HttpServer httpServer;
+    private boolean httpIsStart;
     private String authority;
 
+    public boolean getHttpIsStart() {
+        return this.httpIsStart;
+    }
     public String getAuthority() {
         return this.authority;
     }
@@ -27,23 +31,30 @@ public class opApp extends Application {
     }
 
 
-    public void startHttpServer() throws IOException {
+    public boolean startHttpServer() {
         if (httpServer == null) {
             this.httpServer = new HttpServer(this);
         }
-        if (this.httpServer.wasStarted()) {
-            return;
+        if (this.httpIsStart) {
+            return this.httpIsStart;
         }
-        this.httpServer.start();
+        try {
+            this.httpServer.start();
+            this.httpIsStart = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            this.httpIsStart = false;
+        }
+        return this.httpIsStart;
     }
 
     public void stopHttpServer() {
         if (httpServer == null) {
             return;
         }
-        if (this.httpServer.wasStarted()) {
+        if (this.httpIsStart) {
             this.httpServer.stop();
-            this.httpServer = null;
+            this.httpIsStart = false;
         }
     }
 }
