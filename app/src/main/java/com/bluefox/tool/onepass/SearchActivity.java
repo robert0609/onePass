@@ -1,16 +1,13 @@
 package com.bluefox.tool.onepass;
 
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,7 +30,7 @@ public class SearchActivity extends AuthActivity implements SiteListFragment.OnF
      * 设置左上角back按钮
      */
     public void setBackArrow() {
-        final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_24dp);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_white_24dp);
         //给ToolBar设置左侧的图标
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
         // 给左上角图标的左边加上一个返回的图标 。对应ActionBar.DISPLAY_HOME_AS_UP
@@ -55,6 +52,7 @@ public class SearchActivity extends AuthActivity implements SiteListFragment.OnF
         this.searchInput = (SearchView)MenuItemCompat.getActionView(searchButton);
         this.searchInput.setIconified(false);
         this.searchInput.onActionViewExpanded();
+        this.searchInput.setQueryHint("search...");
         this.searchInput.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

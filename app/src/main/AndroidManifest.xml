@@ -16,10 +16,10 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".HomeActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="standard" />
         <activity
             android:name=".SiteListActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="standard" />
         <activity android:name=".AccountListActivity" />
         <activity
             android:name=".SearchActivity"

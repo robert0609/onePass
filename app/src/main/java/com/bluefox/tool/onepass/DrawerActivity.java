@@ -3,7 +3,6 @@ package com.bluefox.tool.onepass;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -65,16 +64,16 @@ public class DrawerActivity extends AuthActivity implements AdapterView.OnItemCl
      * 设置左上角back按钮
      */
     public void setBackArrow() {
-        final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_24dp);
+        final Drawable drawableMenu = getResources().getDrawable(R.drawable.ic_drawer_menu_white_24dp);
         //给ToolBar设置左侧的图标
-        getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        getSupportActionBar().setHomeAsUpIndicator(drawableMenu);
         // 给左上角图标的左边加上一个返回的图标 。对应ActionBar.DISPLAY_HOME_AS_UP
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //设置返回按钮的点击事件
         this.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                drawerLayout.openDrawer(drawerLeftMenu);
             }
         });
     }
@@ -132,5 +131,6 @@ public class DrawerActivity extends AuthActivity implements AdapterView.OnItemCl
             startActivity(intent);
         }
         this.drawerLayout.closeDrawer(this.drawerLeftMenu);
+        finish();
     }
 }
