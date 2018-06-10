@@ -83,6 +83,14 @@ public class AccountListFragment extends Fragment {
             } else {
                 throw new Exception("parameter is invalid!");
             }
+            // Decrypt password
+            opApp app = (opApp)this.context.getApplicationContext();
+            String auth = app.getAuthority();
+            for (int i = 0; i < accountList.size(); ++i) {
+                Account acc = accountList.get(i);
+                acc.Password = Aes.decrypt(auth, acc.Password);
+            }
+
             this.adapter = new AccountListAdapter(this.context, accountList);
             RecyclerView items = (RecyclerView)view.findViewById(R.id.items);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this.context);
