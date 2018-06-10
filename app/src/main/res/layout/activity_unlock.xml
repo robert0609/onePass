@@ -18,8 +18,7 @@
         android:layout_height="wrap_content"
         android:inputType="text"
         android:maxLines="1"
-        android:singleLine="true"
-        android:text="yanghuiping521"/>
+        android:singleLine="true"/>
 
     <Button
         android:id="@+id/button_unlock"
