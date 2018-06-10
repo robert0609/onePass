@@ -22,7 +22,8 @@ public class DrawerActivity extends AuthActivity implements AdapterView.OnItemCl
     private Toolbar toolbar;
 
     private DrawerLayout drawerLayout;
-    private ListView drawerLeftMenu;
+    private LinearLayout drawerLeftMenu;
+    private ListView drawerLeftMenuList;
     private LinearLayout commonContent;
 
     private List<String> menus;
@@ -41,7 +42,8 @@ public class DrawerActivity extends AuthActivity implements AdapterView.OnItemCl
         this.setBackArrow();
         this.commonContent = (LinearLayout)findViewById(R.id.common_content);
         this.drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        this.drawerLeftMenu = (ListView)findViewById(R.id.drawer_left_menu);
+        this.drawerLeftMenu = (LinearLayout)findViewById(R.id.drawer_left_menu);
+        this.drawerLeftMenuList = (ListView)findViewById(R.id.drawer_left_menu_list);
 
 
         this.titleHome = getResources().getText(R.string.home).toString();
@@ -55,8 +57,8 @@ public class DrawerActivity extends AuthActivity implements AdapterView.OnItemCl
         this.menus.add(titleLevel2);
         this.menus.add(titleLevel3);
         DrawerLeftMenuAdapter drawerLeftMenuAdapter = new DrawerLeftMenuAdapter(this, this.menus);
-        this.drawerLeftMenu.setAdapter(drawerLeftMenuAdapter);
-        this.drawerLeftMenu.setOnItemClickListener(this);
+        this.drawerLeftMenuList.setAdapter(drawerLeftMenuAdapter);
+        this.drawerLeftMenuList.setOnItemClickListener(this);
     }
 
     /**

@@ -79,7 +79,7 @@ public class AccountListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_account_list, container, false);
+        View view = null;
         try {
             List<Account> accountList = null;
             if (this.id > 0) {
@@ -89,36 +89,43 @@ public class AccountListFragment extends Fragment {
             } else {
                 throw new Exception("parameter is invalid!");
             }
-            // Decrypt password
-            opApp app = (opApp)this.context.getApplicationContext();
-            String auth = app.getAuthority();
-            for (int i = 0; i < accountList.size(); ++i) {
-                Account acc = accountList.get(i);
-                acc.Password = Aes.decrypt(auth, acc.Password);
+            if (accountList.size() == 0) {
+                view = inflater.inflate(R.layout.fragment_no_result, container, false);
             }
-
-            this.adapter = new AccountListAdapter(this.context, accountList);
-            this.adapter.setOnAccountClickListener(new AccountListAdapter.OnAccountClickListener() {
-                @Override
-                public void onCopyUserNameClick(View view, String username) {
-                    ClipData data = ClipData.newPlainText("temp", username);
-                    clipboardManager.setPrimaryClip(data);
-                    Toast.makeText(context, "copied successfully!", Toast.LENGTH_SHORT).show();
+            else {
+                view = inflater.inflate(R.layout.fragment_account_list, container, false);
+                // Decrypt password
+                opApp app = (opApp) this.context.getApplicationContext();
+                String auth = app.getAuthority();
+                for (int i = 0; i < accountList.size(); ++i) {
+                    Account acc = accountList.get(i);
+                    acc.Password = Aes.decrypt(auth, acc.Password);
                 }
 
-                @Override
-                public void onCopyPasswordClick(View view, String password) {
-                    ClipData data = ClipData.newPlainText("temp", password);
-                    clipboardManager.setPrimaryClip(data);
-                    Toast.makeText(context, "copied successfully!", Toast.LENGTH_SHORT).show();
-                }
-            });
-            RecyclerView items = (RecyclerView)view.findViewById(R.id.items);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this.context);
-            items.setLayoutManager(layoutManager);
-            items.setAdapter(this.adapter);
+                this.adapter = new AccountListAdapter(this.context, accountList);
+                this.adapter.setOnAccountClickListener(new AccountListAdapter.OnAccountClickListener() {
+                    @Override
+                    public void onCopyUserNameClick(View view, String username) {
+                        ClipData data = ClipData.newPlainText("temp", username);
+                        clipboardManager.setPrimaryClip(data);
+                        Toast.makeText(context, "copied successfully!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onCopyPasswordClick(View view, String password) {
+                        ClipData data = ClipData.newPlainText("temp", password);
+                        clipboardManager.setPrimaryClip(data);
+                        Toast.makeText(context, "copied successfully!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                RecyclerView items = (RecyclerView) view.findViewById(R.id.items);
+                LinearLayoutManager layoutManager = new LinearLayoutManager(this.context);
+                items.setLayoutManager(layoutManager);
+                items.setAdapter(this.adapter);
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            view = inflater.inflate(R.layout.fragment_no_result, container, false);
         }
         return view;
     }

@@ -8,11 +8,11 @@
         android:id="@+id/drawer_item"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:paddingLeft="50dp"
         android:ellipsize="end"
         android:gravity="center_vertical"
         android:maxLines="1"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 </LinearLayout>

@@ -18,7 +18,8 @@
         android:layout_height="wrap_content"
         android:inputType="text"
         android:maxLines="1"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:text="yanghuiping521"/>
 
     <Button
         android:id="@+id/button_unlock"
@@ -27,5 +28,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/button_unlock_title"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textAllCaps="false"/>
 </LinearLayout>

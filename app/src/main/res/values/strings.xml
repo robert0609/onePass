@@ -1,15 +1,17 @@
 <resources>
     <string name="app_name">OnePass</string>
     <string name="app_bar_search_title">Search</string>
-    <string name="button_unlock_title">unlock</string>
-    <string name="button_copy_username_title">copy username</string>
-    <string name="button_copy_password_title">copy password</string>
+    <string name="button_unlock_title">Unlock</string>
+    <string name="button_copy_username_title">Copy username</string>
+    <string name="button_copy_password_title">Copy password</string>
     <string name="title_activity_main">MainActivity</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="home">home</string>
-    <string name="level_1">level 1</string>
-    <string name="level_2">level 2</string>
-    <string name="level_3">level 3</string>
+    <string name="home">Home</string>
+    <string name="level_1">Level 1</string>
+    <string name="level_2">Level 2</string>
+    <string name="level_3">Level 3</string>
+
+    <string name="no_result">No data!</string>
 </resources>

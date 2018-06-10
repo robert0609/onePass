@@ -81,7 +81,7 @@ public class SiteListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_site_list, container, false);
+        View view = null;
         //Bind site item list adapter
         try {
             List<Site> siteList = null;
@@ -97,28 +97,35 @@ public class SiteListFragment extends Fragment {
             else {
                 throw new Exception("parameter is invalid!");
             }
-            this.adapter = new SiteListAdapter(this.context, siteList);
-            this.adapter.setOnSiteClickListener(new SiteListAdapter.OnSiteClickListener() {
-                @Override
-                public void onSiteClick(View view, Site site) {
-                    Intent intent = new Intent(context, AccountListActivity.class);
-                    intent.putExtra("siteId", site.Id);
-                    startActivity(intent);
-                }
+            if (siteList.size() == 0) {
+                view = inflater.inflate(R.layout.fragment_no_result, container, false);
+            }
+            else {
+                view = inflater.inflate(R.layout.fragment_site_list, container, false);
+                this.adapter = new SiteListAdapter(this.context, siteList);
+                this.adapter.setOnSiteClickListener(new SiteListAdapter.OnSiteClickListener() {
+                    @Override
+                    public void onSiteClick(View view, Site site) {
+                        Intent intent = new Intent(context, AccountListActivity.class);
+                        intent.putExtra("siteId", site.Id);
+                        startActivity(intent);
+                    }
 
-                @Override
-                public void onUrlClick(View view, String url) {
-                    Uri uri = Uri.parse(url);
-                    Intent intent  = new Intent(Intent.ACTION_VIEW, uri);
-                    startActivity(intent);
-                }
-            });
-            RecyclerView items = (RecyclerView)view.findViewById(R.id.items);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this.context);
-            items.setLayoutManager(layoutManager);
-            items.setAdapter(this.adapter);
+                    @Override
+                    public void onUrlClick(View view, String url) {
+                        Uri uri = Uri.parse(url);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(intent);
+                    }
+                });
+                RecyclerView items = (RecyclerView) view.findViewById(R.id.items);
+                LinearLayoutManager layoutManager = new LinearLayoutManager(this.context);
+                items.setLayoutManager(layoutManager);
+                items.setAdapter(this.adapter);
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            view = inflater.inflate(R.layout.fragment_no_result, container, false);
         }
         return view;
     }
