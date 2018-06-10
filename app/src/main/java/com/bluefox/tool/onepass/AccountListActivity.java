@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-public class AccountListActivity extends AppCompatActivity implements AccountListFragment.OnFragmentInteractionListener {
+public class AccountListActivity extends AuthActivity implements AccountListFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

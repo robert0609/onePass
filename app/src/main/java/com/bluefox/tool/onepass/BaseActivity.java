@@ -1,6 +1,7 @@
 package com.bluefox.tool.onepass;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,7 +19,9 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class BaseActivity extends AuthActivity implements AdapterView.OnItemClickListener {
+    private Toolbar toolbar;
+
     private DrawerLayout drawerLayout;
     private ListView drawerLeftMenu;
     private LinearLayout commonContent;
@@ -34,8 +37,9 @@ public class BaseActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setTheme(R.style.AppTheme_NoActionBar);
         setContentView(R.layout.activity_base);
-        Toolbar toolbar = (Toolbar)findViewById(R.id.common_toolbar);
-        setSupportActionBar(toolbar);
+        this.toolbar = (Toolbar)findViewById(R.id.common_toolbar);
+        setSupportActionBar(this.toolbar);
+        this.setBackArrow();
         this.commonContent = (LinearLayout)findViewById(R.id.common_content);
         this.drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         this.drawerLeftMenu = (ListView)findViewById(R.id.drawer_left_menu);
@@ -54,6 +58,24 @@ public class BaseActivity extends AppCompatActivity implements AdapterView.OnIte
         DrawerLeftMenuAdapter drawerLeftMenuAdapter = new DrawerLeftMenuAdapter(this, this.menus);
         this.drawerLeftMenu.setAdapter(drawerLeftMenuAdapter);
         this.drawerLeftMenu.setOnItemClickListener(this);
+    }
+
+    /**
+     * 设置左上角back按钮
+     */
+    public void setBackArrow() {
+        final Drawable upArrow = getResources().getDrawable(R.drawable.common_back_ic);
+        //给ToolBar设置左侧的图标
+        getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        // 给左上角图标的左边加上一个返回的图标 。对应ActionBar.DISPLAY_HOME_AS_UP
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //设置返回按钮的点击事件
+        this.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     public void setContentLayout(int layoutId) {

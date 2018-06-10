@@ -21,12 +21,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <!--<android.support.v7.widget.SearchView-->
-        <!--android:id="@+id/input_keyword"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="?actionBarSize"-->
-        <!--android:background="?attr/colorPrimary"/>-->
-
 
     <FrameLayout
         android:id="@+id/search_result"

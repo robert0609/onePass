@@ -1,6 +1,7 @@
 package com.bluefox.tool.onepass;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -12,8 +13,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
-public class SearchActivity extends AppCompatActivity implements SiteListFragment.OnFragmentInteractionListener {
+public class SearchActivity extends AuthActivity implements SiteListFragment.OnFragmentInteractionListener {
+    private Toolbar toolbar;
 
     private SearchView searchInput;
 
@@ -21,8 +24,27 @@ public class SearchActivity extends AppCompatActivity implements SiteListFragmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        Toolbar toolbar = (Toolbar)findViewById(R.id.search_toolbar);
-        setSupportActionBar(toolbar);
+        this.toolbar = (Toolbar)findViewById(R.id.search_toolbar);
+        setSupportActionBar(this.toolbar);
+        this.setBackArrow();
+    }
+
+    /**
+     * 设置左上角back按钮
+     */
+    public void setBackArrow() {
+        final Drawable upArrow = getResources().getDrawable(R.drawable.common_back_ic);
+        //给ToolBar设置左侧的图标
+        getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        // 给左上角图标的左边加上一个返回的图标 。对应ActionBar.DISPLAY_HOME_AS_UP
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //设置返回按钮的点击事件
+        this.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
 
