@@ -15,11 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".HomeActivity"
-            android:launchMode="standard" />
-        <activity
-            android:name=".SiteListActivity"
-            android:launchMode="standard" />
+            android:name=".HomeActivity" />
         <activity android:name=".AccountListActivity" />
         <activity
             android:name=".SearchActivity"
