@@ -52,8 +52,8 @@ public class HttpServer extends NanoHTTPD {
                         return this.handleNotFound();
                     case "/backup.db":
                         return this.checkAuth(session) ? this.handleBackup() : this.needAuthReponse();
-                    case "/register":
-                        return this.handleRegister();
+//                    case "/register":
+//                        return this.handleRegister();
                     default:
                         inputStream = this.context.getAssets().open("content/index.html");
                         return newChunkedResponse(Response.Status.OK, "text/html", inputStream);
@@ -107,10 +107,10 @@ public class HttpServer extends NanoHTTPD {
         }
     }
 
-    private Response handleRegister() throws Exception {
-        long id = Store.getInstance(this.context).saveUser(Md5.execute("yanghuiping521"));//TODO:
-        return newFixedLengthResponse(Response.Status.OK, "text/plain", String.valueOf(id));
-    }
+//    private Response handleRegister() throws Exception {
+//        long id = Store.getInstance(this.context).saveUser(Md5.execute("yanghuiping521"));
+//        return newFixedLengthResponse(Response.Status.OK, "text/plain", String.valueOf(id));
+//    }
 
     private Response handleWebApi(IHTTPSession session) {
         try {

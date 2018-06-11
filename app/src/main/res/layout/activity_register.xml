@@ -10,31 +10,36 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".UnlockActivity">
+    tools:context=".RegisterActivity">
 
     <ImageView
-        android:id="@+id/unlock_logo"
+        android:id="@+id/register_logo"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         app:srcCompat="@drawable/ic_unlock" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/register_description"/>
+
     <EditText
-        android:id="@+id/input_token"
+        android:id="@+id/register_input_token"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="0dp"
         android:inputType="text"
         android:maxLines="1"
         android:singleLine="true"
-        android:hint="@string/unlock_input_token_hint"/>
+        android:hint="@string/register_input_token_hint"/>
 
     <Button
-        android:id="@+id/button_unlock"
+        android:id="@+id/register_button_submit"
         style="?android:textAppearanceSmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/button_unlock_title"
+        android:text="@string/register_button_submit_title"
         android:textStyle="bold"
         android:textAllCaps="false"/>
 </LinearLayout>

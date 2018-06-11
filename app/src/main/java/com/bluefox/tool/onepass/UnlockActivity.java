@@ -16,6 +16,20 @@ public class UnlockActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_unlock);
+        try {
+            String authInDB = Store.getInstance(this).getUser();
+            if (authInDB == null) {
+                Intent intent = new Intent(this, RegisterActivity.class);
+                startActivity(intent);
+                finish();
+                return;
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         this.inputToken = (EditText)findViewById(R.id.input_token);
         this.buttonUnlock = (Button)findViewById(R.id.button_unlock);
