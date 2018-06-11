@@ -62,9 +62,24 @@ public class SiteListFragment extends Fragment {
         return fragment;
     }
 
+    public static Bundle generateParams(long id, int level, String keyword) {
+        Bundle args = new Bundle();
+        args.putLong(ARG_ID, id);
+        args.putInt(ARG_LEVEL, level);
+        args.putString(ARG_KEYWORD, keyword);
+        return args;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("SiteListFragment: ", "onCreate");
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        Log.i("SiteListFragment: ", "onCreateView");
         if (getArguments() != null) {
             id = getArguments().getLong(ARG_ID);
             level = getArguments().getInt(ARG_LEVEL);
@@ -75,11 +90,6 @@ public class SiteListFragment extends Fragment {
             level = 0;
             keyword = null;
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = null;
         //Bind site item list adapter
@@ -130,6 +140,18 @@ public class SiteListFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.i("SiteListFragment: ", "onStart");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i("SiteListFragment: ", "onResume");
+    }
+
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -139,6 +161,7 @@ public class SiteListFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        Log.i("SiteListFragment: ", "onAttach");
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
             this.context = context;
@@ -151,6 +174,7 @@ public class SiteListFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        Log.i("SiteListFragment: ", "onDetach");
         mListener = null;
     }
 

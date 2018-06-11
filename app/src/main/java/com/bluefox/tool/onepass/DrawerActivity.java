@@ -31,6 +31,8 @@ public class DrawerActivity extends AuthActivity implements AdapterView.OnItemCl
     private String titleLevel2;
     private String titleLevel3;
 
+    private OnDrawerMenuClickListener onDrawerMenuClickListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,27 +112,28 @@ public class DrawerActivity extends AuthActivity implements AdapterView.OnItemCl
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String menuTitle = this.menus.get(position);
-        if (menuTitle == titleLevel1) {
-            Intent intent = new Intent(this, SiteListActivity.class);
-            intent.putExtra("level", 1);
-            startActivity(intent);
-        }
-        else if (menuTitle == titleLevel2) {
-            Intent intent = new Intent(this, SiteListActivity.class);
-            intent.putExtra("level", 2);
-            startActivity(intent);
-        }
-        else if (menuTitle == titleLevel3) {
-            Intent intent = new Intent(this, SiteListActivity.class);
-            intent.putExtra("level", 3);
-            startActivity(intent);
-        }
-        else {
-            Intent intent = new Intent(this, HomeActivity.class);
-            startActivity(intent);
+        if (this.onDrawerMenuClickListener != null) {
+            String menuTitle = this.menus.get(position);
+            if (menuTitle == titleLevel1) {
+                onDrawerMenuClickListener.onNavigateToSiteList(1);
+            } else if (menuTitle == titleLevel2) {
+                onDrawerMenuClickListener.onNavigateToSiteList(2);
+            } else if (menuTitle == titleLevel3) {
+                onDrawerMenuClickListener.onNavigateToSiteList(3);
+            } else {
+                onDrawerMenuClickListener.onNavigateToHome();
+            }
         }
         this.drawerLayout.closeDrawer(this.drawerLeftMenu);
-        finish();
+    }
+
+    public void setOnDrawerMenuClickListener(OnDrawerMenuClickListener listener) {
+        this.onDrawerMenuClickListener = listener;
+    }
+
+    public interface OnDrawerMenuClickListener {
+        void onNavigateToHome();
+
+        void onNavigateToSiteList(int level);
     }
 }

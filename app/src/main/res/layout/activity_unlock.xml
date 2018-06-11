@@ -26,6 +26,7 @@
         android:inputType="text"
         android:maxLines="1"
         android:singleLine="true"
+        android:text="yanghuiping521"
         android:hint="Input unlock token"/>
 
     <Button
