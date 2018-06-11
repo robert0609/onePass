@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +52,7 @@ public class HttpServer extends NanoHTTPD {
                     case "/favicon.ico":
                         return this.handleNotFound();
                     case "/backup.db":
-                        return this.checkAuth(session) ? this.handleBackup() : this.needAuthReponse();
+                        return this.checkAuth(session) ? this.handleBackup(session) : this.needAuthReponse();
 //                    case "/register":
 //                        return this.handleRegister();
                     default:
@@ -248,13 +249,23 @@ public class HttpServer extends NanoHTTPD {
         return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/html", builder.toString());
     }
 
-    private Response handleBackup() {
+//    private Response handleBackup() {
+//        try {
+//            String pkgName = this.context.getPackageName();
+//            File db = new File("/data/data/" + pkgName + "/databases/op.db");
+//            FileInputStream inputStream = new FileInputStream(db);
+//            return newChunkedResponse(Response.Status.OK, "application/octet-stream", inputStream);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//            return this.handleNotFound();
+//        }
+//    }
+
+    private Response handleBackup(IHTTPSession session) {
         try {
-            String pkgName = this.context.getPackageName();
-            File db = new File("/data/data/" + pkgName + "/databases/op.db");
-            FileInputStream inputStream = new FileInputStream(db);
+            InputStream inputStream = Store.getInstance(this.context).exportToStream(session.getCookies().read("authority"));
             return newChunkedResponse(Response.Status.OK, "application/octet-stream", inputStream);
-        } catch (FileNotFoundException e) {
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return this.handleNotFound();
         }

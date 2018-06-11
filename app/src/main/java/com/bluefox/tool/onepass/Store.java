@@ -9,6 +9,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.bluefox.tool.onepass.model.Account;
 import com.bluefox.tool.onepass.model.Site;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -231,6 +238,36 @@ public class Store extends SQLiteOpenHelper {
         }
         catch (Exception ex) {
             throw ex;
+        }
+        finally {
+            db.close();
+        }
+    }
+
+    public InputStream exportToStream(String auth) throws UnsupportedEncodingException {
+        SQLiteDatabase db = this.getReadableDatabase();
+        try {
+            Cursor cursor = db.rawQuery("select s.level, s.name, s.url, c.uid, c.pwd from site s left join certification c on s.id = c.siteId", null);
+            StringBuilder sb = new StringBuilder();
+            while (cursor.moveToNext()) {
+                sb.append(cursor.getString(cursor.getColumnIndex("level")));
+                sb.append(',');
+                sb.append(cursor.getString(cursor.getColumnIndex("name")));
+                sb.append(',');
+                sb.append(cursor.getString(cursor.getColumnIndex("url")));
+                sb.append(',');
+                sb.append(cursor.getString(cursor.getColumnIndex("uid")));
+                sb.append(',');
+                String pwd = cursor.getString(cursor.getColumnIndex("pwd"));
+                sb.append(Aes.decrypt(auth, pwd));
+                sb.append('\n');
+            }
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(sb.toString().getBytes("utf-8"));
+            return inputStream;
+        }
+        catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            throw e;
         }
         finally {
             db.close();
