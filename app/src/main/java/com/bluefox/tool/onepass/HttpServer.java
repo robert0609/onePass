@@ -213,6 +213,7 @@ public class HttpServer extends NanoHTTPD {
                     throw new Exception("Save account failed! Body is null");
                 }
                 Account newAccount = gson.fromJson(postBodies.get(0), Account.class);
+                newAccount.UserName = URLDecoder.decode(newAccount.UserName);
                 newAccount.Password = Aes.encrypt(auth, newAccount.Password);
                 long accountId = Store.getInstance(this.context).saveAccount(newAccount);
                 return newFixedLengthResponse(Response.Status.OK, "application/json", gson.toJson(new WebApiResponse<SaveAccountResult>(new SaveAccountResult(accountId))));
