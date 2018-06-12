@@ -5,15 +5,20 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.bluefox.tool.onepass.model.Account;
 import com.bluefox.tool.onepass.model.Site;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -247,7 +252,7 @@ public class Store extends SQLiteOpenHelper {
     public InputStream exportToStream(String auth) throws UnsupportedEncodingException {
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.rawQuery("select s.level, s.name, s.url, c.uid, c.pwd from site s left join certification c on s.id = c.siteId", null);
+            Cursor cursor = db.rawQuery("select s.level, s.name, s.url, c.uid, c.pwd from site s left join certification c on s.id = c.siteId order by s.name", null);
             StringBuilder sb = new StringBuilder();
             while (cursor.moveToNext()) {
                 sb.append(cursor.getString(cursor.getColumnIndex("level")));
@@ -272,5 +277,97 @@ public class Store extends SQLiteOpenHelper {
         finally {
             db.close();
         }
+    }
+
+    public void importFromStream(String auth, InputStream stream) throws Exception {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        InputStreamReader reader = null;
+        BufferedReader bufferedReader = null;
+        try {
+            reader = new InputStreamReader(stream, "utf-8");
+            bufferedReader = new BufferedReader(reader);
+            String currentSiteName = null;
+            long currentSiteId = 0;
+            String line = bufferedReader.readLine();
+            while (line != null) {
+                // Handle per line data
+                String[] fields = line.split(",");
+                int level;
+                try {
+                    level = Integer.parseInt(fields[0]);
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    level = 0;
+                }
+                String name = fields[1];
+                String url = fields[2];
+                String uid = fields[3];
+                String pwd = fields[4];
+
+                if (validateSite(name, level)) {
+                    if (!name.equals(currentSiteName)) {
+                        ContentValues values = new ContentValues();
+                        values.put("name", name);
+                        values.put("url", url);
+                        values.put("level", level);
+                        currentSiteId = db.insert("site", null, values);
+
+                        currentSiteName = name;
+                    }
+
+                    if (validateAccount(uid, pwd)) {
+                        Log.i("restore data", line);
+
+                        ContentValues values1 = new ContentValues();
+                        values1.put("siteId", currentSiteId);
+                        values1.put("uid", uid);
+                        values1.put("pwd", Aes.encrypt(auth, pwd));
+                        db.insert("certification", null, values1);
+                    }
+                }
+
+                line = bufferedReader.readLine();
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            db.endTransaction();
+            db.close();
+            try {
+                if (bufferedReader != null) {
+                    bufferedReader.close();
+                }
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+
+    private boolean validateSite(String name, int level) {
+        boolean result = true;
+        if (name == null || name.equals("") || name.toLowerCase().equals("null")) {
+            result = false;
+        }
+        if (level < 1 || level > 3) {
+            result = false;
+        }
+        return result;
+    }
+
+
+    private boolean validateAccount(String uid, String pwd) {
+        boolean result = true;
+        if (uid == null || uid.equals("") || uid.toLowerCase().equals("null") || pwd == null || pwd.equals("") || pwd.toLowerCase().equals("null")) {
+            result = false;
+        }
+        return result;
     }
 }

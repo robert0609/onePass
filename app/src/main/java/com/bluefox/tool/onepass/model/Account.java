@@ -15,10 +15,10 @@ public class Account {
         if (this.SiteId <= 0) {
             throw new Exception("SiteId is invalid!");
         }
-        if (this.UserName == null || this.UserName == "") {
+        if (this.UserName == null || this.UserName.equals("")) {
             throw new Exception("UserName is empty!");
         }
-        if (this.Password == null || this.Password == "") {
+        if (this.Password == null || this.Password.equals("")) {
             throw new Exception("Password is empty!");
         }
     }

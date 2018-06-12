@@ -18,7 +18,7 @@ public class AuthActivity extends AppCompatActivity {
         try {
             opApp app = (opApp) getApplicationContext();
             String auth = app.getAuthority();
-            if (auth == null || auth == "") {
+            if (auth == null || auth.equals("")) {
                 this.gotoUnlock();
                 return false;
             } else if (!app.validateAuthority(auth)) {

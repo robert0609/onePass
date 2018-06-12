@@ -16,10 +16,10 @@ public class Site {
     }
 
     public void validate() throws Exception {
-        if (this.Name == null || this.Name == "") {
+        if (this.Name == null || this.Name.equals("")) {
             throw new Exception("Name is empty!");
         }
-        if (this.Url == null || this.Url == "") {
+        if (this.Url == null || this.Url.equals("")) {
             throw new Exception("Url is empty!");
         }
         if (this.Level <= 0) {

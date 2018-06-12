@@ -7,13 +7,16 @@ import com.bluefox.tool.onepass.model.Account;
 import com.bluefox.tool.onepass.model.Site;
 import com.google.gson.Gson;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +34,8 @@ public class HttpServer extends NanoHTTPD {
     @Override
     public Response serve(IHTTPSession session) {
         try {
+            Map<String, String> files = new HashMap<>();
             if (session.getMethod().equals(Method.POST)) {
-                Map<String, String> files = new HashMap<>();
                 session.parseBody(files);//TODO: test files' data
             }
             String requestPath = session.getUri();
@@ -51,8 +54,10 @@ public class HttpServer extends NanoHTTPD {
                 switch (requestPath) {
                     case "/favicon.ico":
                         return this.handleNotFound();
-                    case "/backup.db":
+                    case "/backup":
                         return this.checkAuth(session) ? this.handleBackup(session) : this.needAuthReponse();
+                    case "/restore":
+                        return this.checkAuth(session) ? this.handleRestore(session, files) : this.needAuthReponse();
 //                    case "/register":
 //                        return this.handleRegister();
                     default:
@@ -78,11 +83,11 @@ public class HttpServer extends NanoHTTPD {
             auth = authes.get(0);
         }
         //parameter中不存在，再从cookie中取
-        if (auth == null || auth == "") {
+        if (auth == null || auth.equals("")) {
             auth = session.getCookies().read("authority");
         }
 
-        if (auth == null || auth == "") {
+        if (auth == null || auth.equals("")) {
             return false;
         }
         String md5AuthInDB = Store.getInstance(this.context).getUser();
@@ -148,7 +153,7 @@ public class HttpServer extends NanoHTTPD {
         if (keywords != null && keywords.size() > 0) {
             keyword = keywords.get(0);
         }
-        if (keyword == null || keyword == "") {
+        if (keyword == null || keyword.equals("")) {
             throw new Exception("Search failed! Keyword is null!");
         }
         List<String> withaccounts = parameters.get("withaccount");
@@ -268,6 +273,18 @@ public class HttpServer extends NanoHTTPD {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return this.handleNotFound();
+        }
+    }
+
+    private Response handleRestore(IHTTPSession session, Map<String, String> files) {
+        try {
+            Gson gson = new Gson();
+            FileInputStream fileInputStream = new FileInputStream(files.get("backup"));
+            Store.getInstance(this.context).importFromStream(session.getCookies().read("authority"), fileInputStream);
+            return newFixedLengthResponse(Response.Status.OK, "application/json", gson.toJson(new WebApiResponse()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return this.handleError(e);
         }
     }
 

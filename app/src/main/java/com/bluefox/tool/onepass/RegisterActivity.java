@@ -25,7 +25,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onClick(View v) {
         String auth = inputToken.getText().toString();
-        if (auth == null || auth == "") {
+        if (auth == null || auth.equals("")) {
             Toast.makeText(this, "Please input token!", Toast.LENGTH_SHORT).show();
             return;
         }
