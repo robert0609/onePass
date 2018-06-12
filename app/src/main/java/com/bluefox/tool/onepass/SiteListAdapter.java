@@ -38,7 +38,8 @@ public class SiteListAdapter extends RecyclerView.Adapter<SiteListAdapter.SiteLi
     public void onBindViewHolder(@NonNull SiteListHolder holder, int position) {
         final Site item = this.items.get(position);
         holder.siteName.setText(item.Name);
-        holder.url.setText(item.Url);
+        final String url = item.Url.equals("none") ? "" : item.Url;
+        holder.url.setText(url);
 
         if (this.onSiteClickListener != null) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -51,7 +52,7 @@ public class SiteListAdapter extends RecyclerView.Adapter<SiteListAdapter.SiteLi
             holder.url.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onSiteClickListener.onUrlClick(v, item.Url);
+                    onSiteClickListener.onUrlClick(v, url);
                 }
             });
         }

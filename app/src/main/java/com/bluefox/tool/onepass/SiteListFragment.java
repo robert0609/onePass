@@ -123,6 +123,9 @@ public class SiteListFragment extends Fragment {
 
                     @Override
                     public void onUrlClick(View view, String url) {
+                        if (url.equals("")) {
+                            return;
+                        }
                         Uri uri = Uri.parse(url);
                         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                         startActivity(intent);
