@@ -18,6 +18,17 @@ android {
     }
     productFlavors {
     }
+    applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                output ->
+                    def fileName = "app_${defaultConfig.applicationId }_"+ buildType.name + "_v${defaultConfig.versionName}.apk"
+                    def outFile = output.outputFile
+                    if (outFile != null && outFile.name.endsWith('.apk')) {
+                        outputFileName = fileName  //  output.outputFile 改为 outputFileName
+                    }
+        }
+    }
 }
 
 dependencies {
