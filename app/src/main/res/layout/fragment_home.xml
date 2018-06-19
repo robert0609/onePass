@@ -7,21 +7,25 @@
     android:orientation="vertical"
     tools:context=".HomeFragment">
 
-    <ToggleButton
-        android:id="@+id/web_toggle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textOff=""
-        android:textOn=""
-        android:background="@drawable/web_toggle_selector" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ToggleButton
+            android:id="@+id/web_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textOff=""
+            android:textOn=""
+            android:background="@drawable/web_toggle_selector" />
 
-    <ImageView
-        android:id="@+id/wifi_off"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        app:srcCompat="@drawable/ic_wifi_off_180dp" />
+        <ImageView
+            android:id="@+id/wifi_off"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:srcCompat="@drawable/ic_wifi_off_180dp" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/management_url"

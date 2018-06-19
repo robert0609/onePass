@@ -1,9 +1,12 @@
 package com.bluefox.tool.onepass;
 
 import android.content.Context;
+import android.content.IntentFilter;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +32,10 @@ public class HomeFragment extends Fragment {
     private ImageView wifiOff;
     private TextView webUrl;
 
+    private WifiBroad wifiBroad;
+
+    private boolean isCreatedView = false;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -37,6 +44,42 @@ public class HomeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i("HomeFragment: ", "onCreate");
+        this.wifiBroad = new WifiBroad();
+        this.wifiBroad.setOnWifiStatusListener(new WifiBroad.OnWifiStatusListener() {
+            @Override
+            public void onConnected() {
+                if (isCreatedView) {
+                    //刚连接上wifi的瞬间，无法获取到IP，故等待500毫秒之后获取
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    wifiConnected();
+                }
+            }
+
+            @Override
+            public void onDisconnected() {
+                if (isCreatedView) {
+                    wifiDisconnected();
+                }
+            }
+
+            @Override
+            public void onSwitchOff() {
+
+            }
+
+            @Override
+            public void onSwitchOn() {
+
+            }
+        });
+        IntentFilter filter=new IntentFilter();
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        getActivity().registerReceiver(this.wifiBroad, filter);
     }
 
     @Override
@@ -63,6 +106,8 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+
+        isCreatedView = true;
         return view;
     }
 
@@ -74,27 +119,50 @@ public class HomeFragment extends Fragment {
     }
 
     private void init() {
-        opApp app = (opApp)this.context.getApplicationContext();
         Net net = new Net(this.context);
         String address = net.getLocalIpAddress();
         if (address == null) {
-            webToggle.setVisibility(View.INVISIBLE);
-            wifiOff.setVisibility(View.VISIBLE);
-            app.stopHttpServer();
-            webUrl.setText(R.string.wifi_off_tips);
+            this.wifiDisconnected();
         }
         else {
-            wifiOff.setVisibility(View.INVISIBLE);
-            webToggle.setVisibility(View.VISIBLE);
-            webToggle.setChecked(app.getHttpIsStart());
-            webUrl.setText("http://" + address + ":18888");
+            this.wifiConnected();
         }
+    }
+
+    private void wifiConnected() {
+        opApp app = (opApp) this.context.getApplicationContext();
+        Net net = new Net(this.context);
+        String address = net.getLocalIpAddress();
+        wifiOff.setVisibility(View.INVISIBLE);
+        webToggle.setVisibility(View.VISIBLE);
+        webToggle.setChecked(app.getHttpIsStart());
+        webUrl.setText("http://" + address + ":18888");
+    }
+
+    private void wifiDisconnected() {
+        opApp app = (opApp) this.context.getApplicationContext();
+        webToggle.setVisibility(View.INVISIBLE);
+        wifiOff.setVisibility(View.VISIBLE);
+        app.stopHttpServer();
+        webUrl.setText(R.string.wifi_off_tips);
     }
 
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        isCreatedView = false;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().unregisterReceiver(this.wifiBroad);
     }
 
     @Override

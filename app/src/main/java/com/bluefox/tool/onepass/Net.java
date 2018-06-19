@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -23,6 +24,7 @@ public class Net {
         Context context = this.context.getApplicationContext();
         NetworkInfo info = ((ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         if (info != null && info.isConnected()) {
+            Log.d("get local address", "connected");
             if (info.getType() == ConnectivityManager.TYPE_MOBILE) {
                 //当前使用2G/3G/4G网络
 //                try {
@@ -49,6 +51,7 @@ public class Net {
                 }
             }
         } else {
+            Log.d("get local address", "network info is null or disconnected");
             //当前无网络连接,请在设置中打开网络
         }
         return null;
