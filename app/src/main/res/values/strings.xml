@@ -19,4 +19,5 @@
     <string name="unlock_input_token_hint">Input unlock token</string>
     <string name="register_input_token_hint">Input unlock token</string>
     <string name="register_description">First use, you must set an unlock token. Please remember it!</string>
+    <string name="wifi_off_tips">Your device doesn\'t connect wifi</string>
 </resources>

@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -25,6 +26,7 @@ public class HomeFragment extends Fragment {
     private Context context;
 
     private ToggleButton webToggle;
+    private ImageView wifiOff;
     private TextView webUrl;
 
     public HomeFragment() {
@@ -45,6 +47,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         webToggle = (ToggleButton)view.findViewById(R.id.web_toggle);
         webUrl = (TextView)view.findViewById(R.id.management_url);
+        wifiOff = (ImageView)view.findViewById(R.id.wifi_off);
         webToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -72,9 +75,20 @@ public class HomeFragment extends Fragment {
 
     private void init() {
         opApp app = (opApp)this.context.getApplicationContext();
-        webToggle.setChecked(app.getHttpIsStart());
         Net net = new Net(this.context);
-        webUrl.setText("http://" + net.getLocalIpAddress() + ":18888");
+        String address = net.getLocalIpAddress();
+        if (address == null) {
+            webToggle.setVisibility(View.INVISIBLE);
+            wifiOff.setVisibility(View.VISIBLE);
+            app.stopHttpServer();
+            webUrl.setText(R.string.wifi_off_tips);
+        }
+        else {
+            wifiOff.setVisibility(View.INVISIBLE);
+            webToggle.setVisibility(View.VISIBLE);
+            webToggle.setChecked(app.getHttpIsStart());
+            webUrl.setText("http://" + address + ":18888");
+        }
     }
 
     public void onButtonPressed(Uri uri) {

@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Store extends SQLiteOpenHelper {
+    private static final char splitChar = (char)200;
+
     private static Store __instance;
 
     public static Store getInstance(Context context) {
@@ -256,13 +258,13 @@ public class Store extends SQLiteOpenHelper {
             StringBuilder sb = new StringBuilder();
             while (cursor.moveToNext()) {
                 sb.append(cursor.getString(cursor.getColumnIndex("level")));
-                sb.append(',');
+                sb.append(splitChar);
                 sb.append(cursor.getString(cursor.getColumnIndex("name")));
-                sb.append(',');
+                sb.append(splitChar);
                 sb.append(cursor.getString(cursor.getColumnIndex("url")));
-                sb.append(',');
+                sb.append(splitChar);
                 sb.append(cursor.getString(cursor.getColumnIndex("uid")));
-                sb.append(',');
+                sb.append(splitChar);
                 String pwd = cursor.getString(cursor.getColumnIndex("pwd"));
                 sb.append(Aes.decrypt(auth, pwd));
                 sb.append('\n');
@@ -292,7 +294,7 @@ public class Store extends SQLiteOpenHelper {
             String line = bufferedReader.readLine();
             while (line != null) {
                 // Handle per line data
-                String[] fields = line.split(",");
+                String[] fields = line.split(String.valueOf(splitChar));
                 int level;
                 try {
                     level = Integer.parseInt(fields[0]);
