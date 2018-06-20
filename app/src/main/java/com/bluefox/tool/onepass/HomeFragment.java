@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,12 +50,7 @@ public class HomeFragment extends Fragment {
             public void onConnected() {
                 if (isCreatedView) {
                     //刚连接上wifi的瞬间，无法获取到IP，故等待500毫秒之后获取
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    wifiConnected();
+                    (new WifiConnectedTask()).execute();
                 }
             }
 
@@ -197,5 +192,23 @@ public class HomeFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
+    }
+
+    private class WifiConnectedTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            wifiConnected();
+        }
     }
 }
