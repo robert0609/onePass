@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
 public class SearchActivity extends AuthActivity implements SiteListFragment.OnFragmentInteractionListener {
     private Toolbar toolbar;
@@ -49,10 +50,12 @@ public class SearchActivity extends AuthActivity implements SiteListFragment.OnF
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
         MenuItem searchButton = menu.findItem(R.id.app_bar_input_search);
-        this.searchInput = (SearchView)MenuItemCompat.getActionView(searchButton);
+        this.searchInput = (SearchView)searchButton.getActionView();
         this.searchInput.setIconified(false);
+        this.searchInput.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        this.searchInput.setMaxWidth(Integer.MAX_VALUE);
         this.searchInput.onActionViewExpanded();
-        this.searchInput.setQueryHint("search...");
+        this.searchInput.setQueryHint(getResources().getText(R.string.search_input_hint));
         this.searchInput.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

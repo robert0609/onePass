@@ -38,6 +38,12 @@ public class UnlockActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        inputToken.requestFocus();
+    }
+
+    @Override
     public void onClick(View v) {
         opApp app = (opApp)getApplicationContext();
         String auth = this.inputToken.getText().toString();
