@@ -8,6 +8,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +19,8 @@ public class SearchActivity extends AuthActivity implements SiteListFragment.OnF
 
     private SearchView searchInput;
 
+    private String searchText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +28,16 @@ public class SearchActivity extends AuthActivity implements SiteListFragment.OnF
         this.toolbar = (Toolbar)findViewById(R.id.search_toolbar);
         setSupportActionBar(this.toolbar);
         this.setBackArrow();
+
+        if (savedInstanceState != null) {
+            searchText = savedInstanceState.getString("searchText");
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("searchText", searchInput.getQuery().toString());
     }
 
     /**
@@ -56,6 +69,9 @@ public class SearchActivity extends AuthActivity implements SiteListFragment.OnF
         this.searchInput.setMaxWidth(Integer.MAX_VALUE);
         this.searchInput.onActionViewExpanded();
         this.searchInput.setQueryHint(getResources().getText(R.string.search_input_hint));
+        if (this.searchText != null) {
+            this.searchInput.setQuery(this.searchText, false);
+        }
         this.searchInput.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
