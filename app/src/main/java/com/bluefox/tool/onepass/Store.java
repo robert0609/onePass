@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.bluefox.tool.onepass.model.Account;
@@ -210,7 +211,7 @@ public class Store extends SQLiteOpenHelper {
     public List<Site> search(String keyword, boolean withAccount) {
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.query("site", null, "name like ? or url like ?", new String[] { "%" + keyword + "%" }, null, null, null);
+            Cursor cursor = db.query("site", null, "name like ? or url like ?", new String[] { "%" + keyword + "%", "%" + keyword + "%" }, null, null, null);
             List<Site> result = new ArrayList<>();
             Map<Long, Integer> siteIndexs = new HashMap<>();
             while (cursor.moveToNext()) {
@@ -224,14 +225,16 @@ public class Store extends SQLiteOpenHelper {
             }
 
             if (withAccount) {
-                StringBuilder sbSiteIds = new StringBuilder();
+                List<String> siteIdArgs = new ArrayList<>();
+                List<String> siteIds = new ArrayList<>();
                 if (!result.isEmpty()) {
-                    sbSiteIds.append(result.get(0).Id);
-                    for (int i = 1; i < result.size(); ++i) {
-                        sbSiteIds.append(',').append(result.get(i).Id);
+                    for (int i = 0; i < result.size(); ++i) {
+                        siteIdArgs.add("?");
+                        siteIds.add(String.valueOf(result.get(i).Id));
                     }
                 }
-                Cursor cursor1 = db.query("certification", null, "siteId in (?)", new String[]{sbSiteIds.toString()}, null, null, null);
+                String[] ids = new String[siteIds.size()];
+                Cursor cursor1 = db.query("certification", null, "siteId in (" + TextUtils.join(",", siteIdArgs) + ")", siteIds.toArray(ids), null, null, null);
                 while (cursor1.moveToNext()) {
                     Account account = new Account();
                     account.Id = Long.parseLong(cursor1.getString(cursor1.getColumnIndex("id")));

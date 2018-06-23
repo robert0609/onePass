@@ -133,7 +133,7 @@ public class HttpServer extends NanoHTTPD {
                 case "account":
                     return this.handleAccount(operation, session.getCookies().read("authority"), session.getParameters());
                 case "search":
-                    return this.handleSearch(session.getParameters());
+                    return this.handleSearch(session.getCookies().read("authority"), session.getParameters());
                 default:
                     return this.handleNotFound();
             }
@@ -145,7 +145,7 @@ public class HttpServer extends NanoHTTPD {
         }
     }
 
-    private Response handleSearch(Map<String, List<String>> parameters) throws Exception {
+    private Response handleSearch(String auth, Map<String, List<String>> parameters) throws Exception {
         Gson gson = new Gson();
         String keyword = null;
         boolean withAccount = false;
@@ -161,6 +161,15 @@ public class HttpServer extends NanoHTTPD {
             withAccount = Boolean.parseBoolean(withaccounts.get(0));
         }
         List<Site> sites = Store.getInstance(this.context).search(keyword, withAccount);
+        if (withAccount) {
+            for (int i = 0; i < sites.size(); ++i) {
+                List<Account> accounts = sites.get(i).AccountList;
+                for (int j = 0; j < accounts.size(); ++j) {
+                    Account acc = accounts.get(j);
+                    acc.Password = Aes.decrypt(auth, acc.Password);
+                }
+            }
+        }
         return newFixedLengthResponse(Response.Status.OK, "application/json", gson.toJson(new WebApiResponse<List<Site>>(sites)));
     }
 
