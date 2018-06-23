@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -27,6 +29,8 @@ public class HomeActivity extends DrawerActivity implements HomeFragment.OnFragm
     private HomeFragment homeFragment;
     private SiteListFragment siteListFragment;
 
+    private int fragmentKind = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +48,21 @@ public class HomeActivity extends DrawerActivity implements HomeFragment.OnFragm
             }
         });
 
-        loadHome();
+        if (savedInstanceState != null) {
+            fragmentKind = savedInstanceState.getInt("fragmentKind");
+        }
+        if (fragmentKind == 0) {
+            loadHome();
+        }
+        else {
+            loadSiteList(fragmentKind);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("fragmentKind", fragmentKind);
     }
 
     private void loadHome() {
@@ -55,6 +73,8 @@ public class HomeActivity extends DrawerActivity implements HomeFragment.OnFragm
         homeFragment = new HomeFragment();
         fragmentTransaction.replace(R.id.homeLayout, homeFragment);
         fragmentTransaction.commit();
+
+        fragmentKind = 0;
     }
 
     private void loadSiteList(int level) {
@@ -66,6 +86,8 @@ public class HomeActivity extends DrawerActivity implements HomeFragment.OnFragm
         siteListFragment.setArguments(SiteListFragment.generateParams(0, level, null));
         fragmentTransaction.replace(R.id.homeLayout, siteListFragment);
         fragmentTransaction.commit();
+
+        fragmentKind = level;
     }
 
     @Override
