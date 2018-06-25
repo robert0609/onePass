@@ -16,7 +16,7 @@
         android:layout_gravity="start"
         android:gravity="center"
         android:orientation="vertical"
-        android:background="#FFFFFF">
+        android:background="@color/colorPrimary">
 
         <ListView
             android:id="@+id/drawer_left_menu_list"

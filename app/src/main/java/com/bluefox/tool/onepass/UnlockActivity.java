@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.githang.statusbar.StatusBarCompat;
+
 public class UnlockActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText inputToken;
     private Button buttonUnlock;
@@ -40,6 +42,7 @@ public class UnlockActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onStart() {
         super.onStart();
+        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorPrimary));
         inputToken.requestFocus();
     }
 

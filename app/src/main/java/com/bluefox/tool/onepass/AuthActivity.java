@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import com.githang.statusbar.StatusBarCompat;
+
 public class AuthActivity extends AppCompatActivity {
 
     @Override
@@ -12,6 +14,12 @@ public class AuthActivity extends AppCompatActivity {
         if (this.checkAuth()) {
             super.onCreate(savedInstanceState);//TODO:test
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorPrimary));
     }
 
     private boolean checkAuth() {
