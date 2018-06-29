@@ -40,7 +40,7 @@ public class SiteListFragment extends Fragment {
     private SiteListAdapter adapter;
 
     private int pageIndex = 0;
-    private static final int pageSize = 8;
+    private static final int pageSize = 15;
     private boolean hasMore = false;
     private boolean isLoading = false;
 
