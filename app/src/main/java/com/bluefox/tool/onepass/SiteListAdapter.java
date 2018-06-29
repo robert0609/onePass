@@ -41,7 +41,6 @@ public class SiteListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        Log.d("RecycleView Adaper", "getItemViewType position: " + position);
         if (position == getItemCount() - 1) {
             return loadMoreType;
         }
@@ -53,7 +52,6 @@ public class SiteListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("RecycleView Adaper", "onCreateViewHolder viewType: " + viewType);
         if (viewType == loadMoreType) {
             View view = LayoutInflater.from(this.context).inflate(R.layout.item_load_more, parent, false);
             return new LoadMoreHolder(view);
@@ -67,7 +65,6 @@ public class SiteListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof LoadMoreHolder) {
-            Log.d("RecycleView Adaper", "onBindViewHolder LoadMoreHolder position: " + position);
             LoadMoreHolder loadMoreHolder = (LoadMoreHolder)holder;
             if (hasMore) {
                 loadMoreHolder.loadMore.setText(R.string.pull_up_load_more);
@@ -77,7 +74,6 @@ public class SiteListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         }
         else {
-            Log.d("RecycleView Adaper", "onBindViewHolder SiteListHolder position: " + position);
             SiteListHolder normalHolder = (SiteListHolder)holder;
             final Site item = this.items.get(position);
             normalHolder.siteName.setText(item.Name);
