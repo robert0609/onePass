@@ -39,6 +39,11 @@ public class SiteListFragment extends Fragment {
     private Context context;
     private SiteListAdapter adapter;
 
+    private int pageIndex = 0;
+    private static final int pageSize = 8;
+    private boolean hasMore = false;
+    private boolean isLoading = false;
+
     public SiteListFragment() {
         // Required empty public constructor
     }
@@ -94,25 +99,14 @@ public class SiteListFragment extends Fragment {
         View view = null;
         //Bind site item list adapter
         try {
-            List<Site> siteList = null;
-            if (this.id > 0) {
-                siteList = Store.getInstance(this.context).getSite(this.id, 0);
-            }
-            else if (this.level > 0) {
-                siteList = Store.getInstance(this.context).getSite(0, this.level);
-            }
-            else if (this.keyword != null && this.keyword != "") {
-                siteList = Store.getInstance(this.context).search(this.keyword, false);
-            }
-            else {
-                throw new Exception("parameter is invalid!");
-            }
-            if (siteList.size() == 0) {
+            Store.SitePageList sitePageList = this.loadSiteList(pageIndex);
+            this.hasMore = sitePageList.getHasMore();
+            if (sitePageList.SiteList.size() == 0) {
                 view = inflater.inflate(R.layout.fragment_no_result, container, false);
             }
             else {
                 view = inflater.inflate(R.layout.fragment_site_list, container, false);
-                this.adapter = new SiteListAdapter(this.context, siteList);
+                this.adapter = new SiteListAdapter(this.context, sitePageList);
                 this.adapter.setOnSiteClickListener(new SiteListAdapter.OnSiteClickListener() {
                     @Override
                     public void onSiteClick(View view, Site site) {
@@ -132,15 +126,57 @@ public class SiteListFragment extends Fragment {
                     }
                 });
                 RecyclerView items = (RecyclerView) view.findViewById(R.id.items);
-                LinearLayoutManager layoutManager = new LinearLayoutManager(this.context);
+                final LinearLayoutManager layoutManager = new LinearLayoutManager(this.context);
                 items.setLayoutManager(layoutManager);
                 items.setAdapter(this.adapter);
+                items.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            int lastItemPosition = layoutManager.findLastVisibleItemPosition();
+                            if (lastItemPosition == adapter.getItemCount() - 1 && !isLoading && hasMore) {
+                                isLoading = true;
+                                try {
+                                    Store.SitePageList sitePageList = loadSiteList(++pageIndex);
+                                    hasMore = sitePageList.getHasMore();
+                                    adapter.update(sitePageList);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                isLoading = false;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                        super.onScrolled(recyclerView, dx, dy);
+                    }
+                });
             }
         } catch (Exception e) {
             e.printStackTrace();
             view = inflater.inflate(R.layout.fragment_no_result, container, false);
         }
         return view;
+    }
+
+    private Store.SitePageList loadSiteList(int pageIndex) throws Exception {
+        Store.SitePageList sitePageList = null;
+        if (this.id > 0) {
+            sitePageList = Store.getInstance(this.context).getSite(this.id, 0, pageIndex, this.pageSize, true);
+        }
+        else if (this.level > 0) {
+            sitePageList = Store.getInstance(this.context).getSite(0, this.level, pageIndex, this.pageSize, true);
+        }
+        else if (this.keyword != null && !this.keyword.equals("")) {
+            sitePageList = Store.getInstance(this.context).search(this.keyword, false, pageIndex, this.pageSize, true);
+        }
+        else {
+            throw new Exception("parameter is invalid!");
+        }
+        return sitePageList;
     }
 
     @Override

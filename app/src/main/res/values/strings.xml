@@ -20,5 +20,9 @@
     <string name="register_input_token_hint">Input unlock token</string>
     <string name="register_description">First use, you must set an unlock token. Please remember it!</string>
     <string name="wifi_off_tips">Your device doesn\'t connect wifi</string>
-    <string name="search_input_hint">search...</string>
+    <string name="search_input_hint">Search...</string>
+    
+    <string name="pull_up_load_more">Pull up to load more</string>
+    <string name="loading_more">Loading more...</string>
+    <string name="no_more">There is no more data</string>
 </resources>

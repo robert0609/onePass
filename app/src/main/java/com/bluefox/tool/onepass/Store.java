@@ -89,23 +89,45 @@ public class Store extends SQLiteOpenHelper {
     }
 
     public List<Site> getSite(long id, int level) throws Exception {
+        return this.getSite(id, level, 0, 1000);
+    }
+
+    public List<Site> getSite(long id, int level, int pageIndex, int pageSize) throws Exception {
+        return this.getSite(id, level, pageIndex, pageSize, false).SiteList;
+    }
+
+    public SitePageList getSite(long id, int level, int pageIndex, int pageSize, boolean returnTotalPageCount) throws Exception {
         SQLiteDatabase db = this.getReadableDatabase();
         try {
+            SitePageList result = new SitePageList();
+            if (returnTotalPageCount) {
+                Cursor totalCountCursor = null;
+                if (id > 0) {
+                    totalCountCursor = db.query("site", null, "id=?", new String[] {String.valueOf(id)}, null, null, null);
+                }
+                else {
+                    totalCountCursor = db.query("site", null, "level=?", new String[] {String.valueOf(level)}, null, null, null);
+                }
+                result.TotalPageCount = (int)Math.ceil(((double)totalCountCursor.getCount()) / pageSize);
+            }
+
+            result.PageIndex = pageIndex;
+
+            String limit = (pageIndex * pageSize) + "," + pageSize;
             Cursor cursor = null;
             if (id > 0) {
-                cursor = db.query("site", null, "id=?", new String[] {String.valueOf(id)}, null, null, null);
+                cursor = db.query("site", null, "id=?", new String[] {String.valueOf(id)}, null, null, null, limit);
             }
             else {
-                cursor = db.query("site", null, "level=?", new String[] {String.valueOf(level)}, null, null, null);
+                cursor = db.query("site", null, "level=?", new String[] {String.valueOf(level)}, null, null, null, limit);
             }
-            List<Site> result = new ArrayList<>();
             while (cursor.moveToNext()) {
                 Site site = new Site();
                 site.Id = Long.parseLong(cursor.getString(cursor.getColumnIndex("id")));
                 site.Name = cursor.getString(cursor.getColumnIndex("name"));
                 site.Url = cursor.getString(cursor.getColumnIndex("url"));
                 site.Level = Integer.parseInt(cursor.getString(cursor.getColumnIndex("level")));
-                result.add(site);
+                result.SiteList.add(site);
             }
             return result;
         }
@@ -209,10 +231,26 @@ public class Store extends SQLiteOpenHelper {
     }
 
     public List<Site> search(String keyword, boolean withAccount) {
+        return this.search(keyword, withAccount, 0, 1000);
+    }
+
+    public List<Site> search(String keyword, boolean withAccount, int pageIndex, int pageSize) {
+        return this.search(keyword, withAccount, pageIndex, pageSize, false).SiteList;
+    }
+
+    public SitePageList search(String keyword, boolean withAccount, int pageIndex, int pageSize, boolean returnTotalPageCount) {
         SQLiteDatabase db = this.getReadableDatabase();
         try {
-            Cursor cursor = db.query("site", null, "name like ? or url like ?", new String[] { "%" + keyword + "%", "%" + keyword + "%" }, null, null, null);
-            List<Site> result = new ArrayList<>();
+            SitePageList result = new SitePageList();
+            if (returnTotalPageCount) {
+                Cursor totalCountCursor = db.query("site", null, "name like ? or url like ?", new String[] { "%" + keyword + "%", "%" + keyword + "%" }, null, null, null);
+                result.TotalPageCount = (int)Math.ceil(((double)totalCountCursor.getCount()) / pageSize);
+            }
+
+            result.PageIndex = pageIndex;
+
+            String limit = (pageIndex * pageSize) + "," + pageSize;
+            Cursor cursor = db.query("site", null, "name like ? or url like ?", new String[] { "%" + keyword + "%", "%" + keyword + "%" }, null, null, null, limit);
             Map<Long, Integer> siteIndexs = new HashMap<>();
             while (cursor.moveToNext()) {
                 Site site = new Site();
@@ -220,17 +258,17 @@ public class Store extends SQLiteOpenHelper {
                 site.Name = cursor.getString(cursor.getColumnIndex("name"));
                 site.Url = cursor.getString(cursor.getColumnIndex("url"));
                 site.Level = Integer.parseInt(cursor.getString(cursor.getColumnIndex("level")));
-                result.add(site);
-                siteIndexs.put(site.Id, result.size() - 1);
+                result.SiteList.add(site);
+                siteIndexs.put(site.Id, result.SiteList.size() - 1);
             }
 
             if (withAccount) {
                 List<String> siteIdArgs = new ArrayList<>();
                 List<String> siteIds = new ArrayList<>();
-                if (!result.isEmpty()) {
-                    for (int i = 0; i < result.size(); ++i) {
+                if (!result.SiteList.isEmpty()) {
+                    for (int i = 0; i < result.SiteList.size(); ++i) {
                         siteIdArgs.add("?");
-                        siteIds.add(String.valueOf(result.get(i).Id));
+                        siteIds.add(String.valueOf(result.SiteList.get(i).Id));
                     }
                 }
                 String[] ids = new String[siteIds.size()];
@@ -241,7 +279,7 @@ public class Store extends SQLiteOpenHelper {
                     account.SiteId = Long.parseLong(cursor1.getString(cursor1.getColumnIndex("siteId")));
                     account.UserName = cursor1.getString(cursor1.getColumnIndex("uid"));
                     account.Password = cursor1.getString(cursor1.getColumnIndex("pwd"));
-                    result.get(siteIndexs.get(account.SiteId)).AccountList.add(account);
+                    result.SiteList.get(siteIndexs.get(account.SiteId)).AccountList.add(account);
                 }
             }
             return result;
@@ -374,5 +412,15 @@ public class Store extends SQLiteOpenHelper {
             result = false;
         }
         return result;
+    }
+
+    public class SitePageList {
+        public List<Site> SiteList = new ArrayList<>();
+        public int PageIndex = 0;
+        public int TotalPageCount = 1;
+
+        public boolean getHasMore() {
+            return PageIndex < TotalPageCount - 1;
+        }
     }
 }

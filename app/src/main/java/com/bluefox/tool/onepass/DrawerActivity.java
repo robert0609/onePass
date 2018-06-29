@@ -114,11 +114,11 @@ public class DrawerActivity extends AuthActivity implements AdapterView.OnItemCl
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (this.onDrawerMenuClickListener != null) {
             String menuTitle = this.menus.get(position);
-            if (menuTitle == titleLevel1) {
+            if (menuTitle.equals(titleLevel1)) {
                 onDrawerMenuClickListener.onNavigateToSiteList(1);
-            } else if (menuTitle == titleLevel2) {
+            } else if (menuTitle.equals(titleLevel2)) {
                 onDrawerMenuClickListener.onNavigateToSiteList(2);
-            } else if (menuTitle == titleLevel3) {
+            } else if (menuTitle.equals(titleLevel3)) {
                 onDrawerMenuClickListener.onNavigateToSiteList(3);
             } else {
                 onDrawerMenuClickListener.onNavigateToHome();
