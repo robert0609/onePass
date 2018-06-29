@@ -16,7 +16,7 @@
         android:id="@+id/register_logo"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        app:srcCompat="@drawable/ic_unlock" />
+        app:srcCompat="@drawable/ic_launcher_foreground" />
 
     <TextView
         android:layout_width="match_parent"

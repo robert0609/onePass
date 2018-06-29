@@ -25,4 +25,6 @@
     <string name="pull_up_load_more">Pull up to load more</string>
     <string name="loading_more">Loading more...</string>
     <string name="no_more">There is no more data</string>
+
+    <string name="welcome">Welcome!</string>
 </resources>

@@ -2,6 +2,8 @@ package com.bluefox.tool.onepass;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -17,19 +19,12 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DrawerActivity extends AuthActivity implements AdapterView.OnItemClickListener {
+public class DrawerActivity extends AuthActivity implements NavigationView.OnNavigationItemSelectedListener {
     private Toolbar toolbar;
 
     private DrawerLayout drawerLayout;
-    private LinearLayout drawerLeftMenu;
-    private ListView drawerLeftMenuList;
+    private NavigationView drawerLeftMenu;
     private LinearLayout commonContent;
-
-    private List<String> menus;
-    private String titleHome;
-    private String titleLevel1;
-    private String titleLevel2;
-    private String titleLevel3;
 
     private OnDrawerMenuClickListener onDrawerMenuClickListener;
 
@@ -43,23 +38,9 @@ public class DrawerActivity extends AuthActivity implements AdapterView.OnItemCl
         this.setBackArrow();
         this.commonContent = (LinearLayout)findViewById(R.id.common_content);
         this.drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        this.drawerLeftMenu = (LinearLayout)findViewById(R.id.drawer_left_menu);
-        this.drawerLeftMenuList = (ListView)findViewById(R.id.drawer_left_menu_list);
+        this.drawerLeftMenu = (NavigationView)findViewById(R.id.drawer_left_menu);
 
-
-        this.titleHome = getResources().getText(R.string.home).toString();
-        this.titleLevel1 = getResources().getText(R.string.level_1).toString();
-        this.titleLevel2 = getResources().getText(R.string.level_2).toString();
-        this.titleLevel3 = getResources().getText(R.string.level_3).toString();
-
-        this.menus = new ArrayList<>();
-        this.menus.add(titleHome);
-        this.menus.add(titleLevel1);
-        this.menus.add(titleLevel2);
-        this.menus.add(titleLevel3);
-        DrawerLeftMenuAdapter drawerLeftMenuAdapter = new DrawerLeftMenuAdapter(this, this.menus);
-        this.drawerLeftMenuList.setAdapter(drawerLeftMenuAdapter);
-        this.drawerLeftMenuList.setOnItemClickListener(this);
+        this.drawerLeftMenu.setNavigationItemSelectedListener(this);
     }
 
     /**
@@ -111,25 +92,32 @@ public class DrawerActivity extends AuthActivity implements AdapterView.OnItemCl
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (this.onDrawerMenuClickListener != null) {
-            String menuTitle = this.menus.get(position);
-            if (menuTitle.equals(titleLevel1)) {
-                onDrawerMenuClickListener.onNavigateToSiteList(1);
-            } else if (menuTitle.equals(titleLevel2)) {
-                onDrawerMenuClickListener.onNavigateToSiteList(2);
-            } else if (menuTitle.equals(titleLevel3)) {
-                onDrawerMenuClickListener.onNavigateToSiteList(3);
-            } else {
-                onDrawerMenuClickListener.onNavigateToHome();
+            int id = item.getItemId();
+            switch (id) {
+                case R.id.drawer_item_home:
+                    onDrawerMenuClickListener.onNavigateToHome();
+                    break;
+                case R.id.drawer_item_level_1:
+                    onDrawerMenuClickListener.onNavigateToSiteList(1);
+                    break;
+                case R.id.drawer_item_level_2:
+                    onDrawerMenuClickListener.onNavigateToSiteList(2);
+                    break;
+                case R.id.drawer_item_level_3:
+                    onDrawerMenuClickListener.onNavigateToSiteList(3);
+                    break;
             }
         }
         this.drawerLayout.closeDrawer(this.drawerLeftMenu);
+        return true;
     }
 
     public void setOnDrawerMenuClickListener(OnDrawerMenuClickListener listener) {
         this.onDrawerMenuClickListener = listener;
     }
+
 
     public interface OnDrawerMenuClickListener {
         void onNavigateToHome();

@@ -16,7 +16,7 @@
         android:id="@+id/unlock_logo"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        app:srcCompat="@drawable/ic_unlock" />
+        app:srcCompat="@drawable/ic_launcher_foreground" />
 
     <EditText
         android:id="@+id/input_token"
