@@ -9,25 +9,6 @@
 
     <include layout="@layout/activity_base" />
 
-    <!--<LinearLayout-->
-        <!--android:id="@+id/drawer_left_menu"-->
-        <!--android:layout_width="180dp"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_gravity="start"-->
-        <!--android:gravity="center"-->
-        <!--android:orientation="vertical"-->
-        <!--android:background="@color/colorPrimary">-->
-
-        <!--<ListView-->
-            <!--android:id="@+id/drawer_left_menu_list"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:choiceMode="singleChoice"-->
-            <!--android:divider="#000000"-->
-            <!--android:dividerHeight="0dp" />-->
-
-    <!--</LinearLayout>-->
-
     <android.support.design.widget.NavigationView
         android:id="@+id/drawer_left_menu"
         android:layout_width="180dp"
