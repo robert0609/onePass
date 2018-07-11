@@ -21,9 +21,9 @@
         app:srcCompat="@mipmap/ic_launcher_round" />
 
     <TextView
+        android:id="@+id/drawer_header_version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginLeft="10dp"
-        android:text="@string/welcome"/>
+        android:layout_marginLeft="10dp"/>
 </LinearLayout>

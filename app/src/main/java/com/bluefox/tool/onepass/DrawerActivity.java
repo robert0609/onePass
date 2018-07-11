@@ -1,6 +1,8 @@
 package com.bluefox.tool.onepass;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -15,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +44,10 @@ public class DrawerActivity extends AuthActivity implements NavigationView.OnNav
         this.drawerLeftMenu = (NavigationView)findViewById(R.id.drawer_left_menu);
 
         this.drawerLeftMenu.setNavigationItemSelectedListener(this);
+
+        View drawerHeader = this.drawerLeftMenu.getHeaderView(0);
+        TextView txtVersion = (TextView)drawerHeader.findViewById(R.id.drawer_header_version);
+        txtVersion.setText("Version: " + getVersionName());
     }
 
     /**
@@ -116,6 +123,21 @@ public class DrawerActivity extends AuthActivity implements NavigationView.OnNav
 
     public void setOnDrawerMenuClickListener(OnDrawerMenuClickListener listener) {
         this.onDrawerMenuClickListener = listener;
+    }
+
+    private String getVersionName()
+    {
+        try {
+            // 获取packagemanager的实例
+            PackageManager packageManager = getPackageManager();
+            // getPackageName()是你当前类的包名，0代表是获取版本信息
+            PackageInfo packInfo = packageManager.getPackageInfo(getPackageName(),0);
+            String version = packInfo.versionName;
+            return version;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
 
