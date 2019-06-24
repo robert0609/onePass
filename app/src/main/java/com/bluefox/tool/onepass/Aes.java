@@ -45,6 +45,10 @@ public class Aes {
      * 加密
      */
     public static String encrypt(String key, String cleartext) {
+        // 兼容android 9 以上的加密处理
+        if (android.os.Build.VERSION.SDK_INT >= 28) {
+            return AesAndroid9.des(cleartext, key, Cipher.ENCRYPT_MODE);
+        }
         if (TextUtils.isEmpty(cleartext)) {
             return cleartext;
         }
@@ -71,6 +75,10 @@ public class Aes {
      * 解密
      */
     public static String decrypt(String key, String encrypted) {
+        // 兼容android 9 以上的加密处理
+        if (android.os.Build.VERSION.SDK_INT >= 28) {
+            return AesAndroid9.des(encrypted, key, Cipher.DECRYPT_MODE);
+        }
         if (TextUtils.isEmpty(encrypted)) {
             return encrypted;
         }
