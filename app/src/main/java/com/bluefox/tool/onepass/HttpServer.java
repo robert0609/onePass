@@ -43,9 +43,13 @@ public class HttpServer extends NanoHTTPD {
             if (requestPath.startsWith("/webapi/")) {
                 return this.checkAuth(session) ? this.handleWebApi(session) : this.needAuthReponse();
             }
-            else if (requestPath.startsWith("/static/")) {
+            else if (requestPath.startsWith("/assets/")) {
                 inputStream = this.context.getAssets().open("content" + requestPath);
-                return newChunkedResponse(Response.Status.OK, null, inputStream);
+                if (requestPath.endsWith(".js")) {
+                    return newChunkedResponse(Response.Status.OK, "text/javascript", inputStream);
+                } else {
+                    return newChunkedResponse(Response.Status.OK, null, inputStream);
+                }
             }
             else if (requestPath.startsWith("/login")) {
                 return this.handleLogin(session);
@@ -53,7 +57,8 @@ public class HttpServer extends NanoHTTPD {
             else {
                 switch (requestPath) {
                     case "/favicon.ico":
-                        return this.handleNotFound();
+                        inputStream = this.context.getAssets().open("content" + requestPath);
+                        return newChunkedResponse(Response.Status.OK, null, inputStream);
                     case "/backup":
                         return this.checkAuth(session) ? this.handleBackup(session) : this.needAuthReponse();
                     case "/restore":
